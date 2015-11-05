@@ -19,6 +19,7 @@ executable pixels
   main-is:             Main.hs
   other-modules:       Transformations
   -- other-extensions:    
+  ghc-options:         -Wall -W
   build-depends:       base >= 4.8 && < 4.9
                      , JuicyPixels >= 3.2
   hs-source-dirs:      src
