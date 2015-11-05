@@ -35,3 +35,14 @@ main = do
                 -> writePng outFile
                    $ flip img
               _ -> putStrLn "Please enter valid arguments."
+          ImageRGB8 img ->
+            case args of
+              ("flip":_:outFile:[])
+                -> writePng outFile
+                   $ flip img
+              ("flipHorizontal":_:outFile:[])
+                -> writePng outFile
+                   $ flipHorizontal img
+              ("flipVertical":_:outFile:[])
+                -> writePng outFile
+                   $ flipVertical img

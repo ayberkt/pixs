@@ -2,7 +2,7 @@ module Transformations where
 
 import Control.Applicative
 import Data.Word (Word8(..))
-import Codec.Picture(DynamicImage(..), PixelRGBA8(..), Image(..), pixelMap
+import Codec.Picture(DynamicImage(..), PixelRGBA8(..), Image(..), Pixel, pixelMap
                     ,imageHeight, imageWidth, pixelAt, pixelBaseIndex, generateImage)
 
 adjustBy :: Word8 -> Int -> Word8
@@ -28,13 +28,13 @@ changeGreen amount = pixelMap changeGreen'
   where changeGreen' (PixelRGBA8 r g b a) = PixelRGBA8 r g' b a
                                             where g' = g `adjustBy` amount
 
-flipVertical :: Image PixelRGBA8 -> Image PixelRGBA8
+flipVertical :: Pixel a => Image a -> Image a
 flipVertical img =  generateImage complement (imageWidth img) (imageHeight img)
   where complement x y = pixelAt img x ((imageHeight img) - y - 1)
 
-flipHorizontal :: Image PixelRGBA8 -> Image PixelRGBA8
+flipHorizontal :: Pixel a => Image a -> Image a
 flipHorizontal img = generateImage complement (imageWidth img) (imageHeight img)
   where complement x y = pixelAt img (imageWidth img - x - 1) y
 
-flip :: Image PixelRGBA8 -> Image PixelRGBA8
+flip :: Pixel a => Image a -> Image a
 flip = flipVertical . flipHorizontal
