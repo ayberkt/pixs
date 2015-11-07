@@ -2,8 +2,8 @@ module Transformations where
 
 import Control.Applicative
 import Data.Word (Word8(..))
-import Codec.Picture(DynamicImage(..), PixelRGBA8(..), Image(..), Pixel, pixelMap
-                    ,imageHeight, imageWidth, pixelAt, pixelBaseIndex, generateImage)
+import Codec.Picture(PixelRGBA8(..), Image(..), Pixel, pixelMap
+                    ,imageHeight, imageWidth, pixelAt, generateImage)
 
 adjustBy :: Word8 -> Int -> Word8
 adjustBy x amount
@@ -43,22 +43,27 @@ blur :: Image PixelRGBA8 -> Image PixelRGBA8
 blur img = generateImage blurPixelAt (imageWidth img) (imageHeight img)
   where blurPixelAt :: Int -> Int -> PixelRGBA8
         blurPixelAt x y = 0.125 `scale` pixel'
-          where pixel' = (foldr add black [ (4.0 `scale` (pixelAt img x y))
+          where pixel' = (foldr add black [ (4.0 `scale` (pixelAt' img x y))
                                           , (pixelAt' img (x-1) y)
                                           , (pixelAt' img (x+1) y)
                                           , (pixelAt' img x (y-1))])
-        black = PixelRGBA8 0 0 0 255
-
+        black = PixelRGBA8 0 0 0 0
         scale :: Rational -> PixelRGBA8 -> PixelRGBA8
         scale x (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
           where (r':g':b':[]) = map (fromIntegral . truncate . (x *) . toRational) [r, g, b]
 
-        add (PixelRGBA8 r1 g1 b1 a1) (PixelRGBA8 r2 g2 b2 a2) = newPixel
-          where newPixel = PixelRGBA8 (r1 + r2) (g1 + g2) (b1 + b2) 255
+        -- TODO: Since pixel components are of type Word8, they might be
+        -- wrapping around when two colors are added to each other. A
+        -- possible fix is to modify adjustBy so that it can be used to fix
+        -- and then using it.
+        add (PixelRGBA8 r1 g1 b1 _) (PixelRGBA8 r2 g2 b2 _) = newPixel
+          where newPixel = PixelRGBA8 (r1 + r2)
+                                      (g1 + g2)
+                                      (b1 + b2)
+                                      255
 
         pixelAt' img x y
-          | x < 0 = black
-          | x > (imageWidth img)-1 = black
-          | y < 0 = black
-          | y > (imageHeight img)-1 = black
+          | (x < 0) || (y < 0) ||
+            (x >= (imageWidth img)) ||
+            (y >= (imageHeight img)) = pixelAt img 0 0
           | otherwise = pixelAt img x y
