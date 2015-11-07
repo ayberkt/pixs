@@ -34,6 +34,9 @@ main = do
               ("flip":_:outFile:[])
                 -> writePng outFile
                    $ flip img
+              ("blur":_:outFile:[])
+                -> writePng outFile
+                   $ blur img
               _ -> putStrLn "Please enter valid arguments."
           ImageRGB8 img ->
             case args of
