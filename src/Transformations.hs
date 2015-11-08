@@ -1,21 +1,20 @@
 module Transformations where
 
-import Control.Applicative
 import Data.Word (Word8(..))
 import Codec.Picture(PixelRGBA8(..), Image(..), Pixel, pixelMap
                     ,imageHeight, imageWidth, pixelAt, generateImage)
 
-adjustBy :: Word8 -> Int -> Word8
+adjustBy :: (Num a, Integral a) => Word8 -> a -> Word8
 adjustBy x amount
   | newVal > 255 = 255
-  -- | newVal < 0   = fromIntegral 0
+  | newVal < 0   = fromIntegral 0
   | otherwise    = newVal
   where newVal   = fromIntegral (x + fromIntegral amount)
 
 changeBrightness :: Int -> Image PixelRGBA8 -> Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
   where changeBrightness' (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
-          where r' = r `adjustBy` amount
+          where r' = r `adjustBy` fromIntegral amount
                 g' = g `adjustBy` amount
                 b' = b `adjustBy` amount
 
@@ -57,13 +56,13 @@ blur img = generateImage blurPixelAt (imageWidth img) (imageHeight img)
         -- possible fix is to modify adjustBy so that it can be used to fix
         -- and then using it.
         add (PixelRGBA8 r1 g1 b1 _) (PixelRGBA8 r2 g2 b2 _) = newPixel
-          where newPixel = PixelRGBA8 (r1 + r2)
-                                      (g1 + g2)
-                                      (b1 + b2)
+          where newPixel = PixelRGBA8 (r1 `adjustBy` r2)
+                                      (g1 `adjustBy` g2)
+                                      (b1 `adjustBy` b2)
                                       255
 
         pixelAt' img x y
           | (x < 0) || (y < 0) ||
             (x >= (imageWidth img)) ||
-            (y >= (imageHeight img)) = pixelAt img 0 0
+            (y >= (imageHeight img)) = black
           | otherwise = pixelAt img x y
