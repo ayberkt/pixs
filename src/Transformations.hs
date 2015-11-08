@@ -29,6 +29,8 @@ instance Num PixelRGBA8 where
   fromInteger _ = undefined
   signum _ = undefined
 
+-- TODO: this will no longer be useful when pixel
+-- algebra is fully implemented.
 adjustBy :: (Num a, Integral a) => Word8 -> a -> Word8
 adjustBy x amount
   | newVal > 255 = 255
