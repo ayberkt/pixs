@@ -49,3 +49,8 @@ main = do
               ("flipVertical":_:outFile:[])
                 -> writePng outFile
                    $ flipVertical img
+              _ -> putStrLn "Please enter valid arguments."
+          ImageY8 img -> putStrLn "Type not handled yet."
+          ImageY16 img -> putStrLn "Type not handled yet."
+          ImageYF img -> putStrLn "Type not handled yet."
+          ImageYA8 img -> putStrLn "Type not handled yet."
