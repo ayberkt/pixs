@@ -1,10 +1,10 @@
-import Control.Applicative
-import Prelude hiding (flip)
+import Prelude hiding (flip, error)
 import System.Environment (getArgs)
 import Codec.Picture (readImage, writePng, DynamicImage(..))
 import Transformations
 
 
+main :: IO ()
 main = do
   -- TODO: There is probably a much better way of
   -- doing argument parsing here.
@@ -50,7 +50,14 @@ main = do
                 -> writePng outFile
                    $ flipVertical img
               _ -> putStrLn "Please enter valid arguments."
-          ImageY8 img -> putStrLn "Type not handled yet."
-          ImageY16 img -> putStrLn "Type not handled yet."
-          ImageYF img -> putStrLn "Type not handled yet."
-          ImageYA8 img -> putStrLn "Type not handled yet."
+          ImageY8 _ -> putStrLn "Type not handled yet."
+          ImageY16 _ -> putStrLn "Type not handled yet."
+          ImageYF _ -> putStrLn "Type not handled yet."
+          ImageYA8 _ -> putStrLn "Type not handled yet."
+          ImageYA16 _ -> putStrLn "Type not handled yet."
+          ImageRGBA16 _ -> putStrLn "Type not handled yet."
+          ImageRGBF _ -> putStrLn "Type not handled yet."
+          ImageRGB16 _ -> putStrLn "Type not handled yet."
+          ImageYCbCr8 _ -> putStrLn "Type not handled yet."
+          ImageCMYK8 _ -> putStrLn "Type not handled yet."
+          ImageCMYK16 _ -> putStrLn "Type not handled yet."
