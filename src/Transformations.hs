@@ -23,7 +23,7 @@ instance Num PixelRGBA8 where
     where r' = addColors r1 r2
           g' = addColors g1 g2
           b' = addColors b1 b2
-  
+
   _ * _ = undefined
   abs _ = undefined
   fromInteger _ = undefined

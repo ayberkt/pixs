@@ -1,6 +1,7 @@
 module Main where
 import Test.Hspec
 import Test.QuickCheck
+import Transformations
 
 plusCommutative :: Int -> Int -> Bool
 plusCommutative x y = x + y == y + x
