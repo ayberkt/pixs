@@ -23,6 +23,7 @@ instance Arbitrary (Image PixelRGBA8) where
 
 
 deriving instance Eq (Image PixelRGBA8)
+deriving instance Show (Image PixelRGBA8)
 
 -- instance Eq (Image PixelRGBA8) where
 --   img1 == img2
@@ -45,9 +46,6 @@ deriving instance Eq (Image PixelRGBA8)
 --           height1 = imageHeight img1
 --           height2 = imageHeight img2
 --           foo p q x y = (pixelAt p x y) == (pixelAt q x y)
-
-instance Show (Image PixelRGBA8) where
-  show _ = ""
 
 reflexivity :: Image PixelRGBA8 -> Bool
 reflexivity img = img == img
