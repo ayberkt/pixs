@@ -31,9 +31,10 @@ test-suite spec
   hs-source-dirs:       tests
                       , src
   ghc-options:          -Wall
-  main-is:              tests/Main.hs
+  main-is:              Main.hs
   other-modules:        Transformations
   build-depends:        base >= 4.8 && < 4.9
                       , hspec
                       , QuickCheck
                       , JuicyPixels >= 3.2
+                      , vector
