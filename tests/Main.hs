@@ -1,10 +1,12 @@
-{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE  FlexibleInstances
+            , GeneralizedNewtypeDeriving
+            , StandaloneDeriving #-}
 
 module Main where
 import Test.Hspec
 import Test.QuickCheck
 import Data.Word (Word8)
-import Codec.Picture (PixelRGBA8(..), Image(..), pixelAt)
+import Codec.Picture (PixelRGBA8(..), Image(..), pixelAt, PixelBaseComponent(..))
 import Control.Applicative
 import qualified Transformations as T
 import qualified Data.Vector.Storable as VS
@@ -19,23 +21,30 @@ instance Arbitrary (Image PixelRGBA8) where
                    , imageData   = VS.fromList l
                    }
 
-instance Eq (Image PixelRGBA8) where
-  img1 == img2
-    | (width1 == 0) && (width2 == 0)
-      = True
-    | (height1 == 0) && (height2 == 0)
-      = True
-    | width1 /= width2
-      = False
-    | height1 /= height2
-      = False
-    | otherwise = all id [(foo img1 img2 x y) | x <- [0..width1]
-                                              , y <- [0..height1]]
-    where width1  = imageWidth  img1
-          width2  = imageWidth  img2
-          height1 = imageHeight img1
-          height2 = imageHeight img2
-          foo p q x y = (pixelAt p x y) == (pixelAt q x y)
+
+deriving instance Eq (Image PixelRGBA8)
+
+-- instance Eq (Image PixelRGBA8) where
+--   img1 == img2
+--     | (width1 < 0) || (width2 < 0)
+--       = True
+--     | (height1 < 0) || (height2 < 0)
+--       = True
+--     | (width1 == 0) && (width2 == 0)
+--       = True
+--     | (height1 == 0) && (height2 == 0)
+--       = True
+--     | width1 /= width2
+--       = False
+--     | height1 /= height2
+--       = False
+--     | otherwise = all id [(foo img1 img2 x y) | x <- [0..width1]
+--                                               , y <- [0..height1]]
+--     where width1  = imageWidth  img1
+--           width2  = imageWidth  img2
+--           height1 = imageHeight img1
+--           height2 = imageHeight img2
+--           foo p q x y = (pixelAt p x y) == (pixelAt q x y)
 
 instance Show (Image PixelRGBA8) where
   show _ = ""
@@ -54,6 +63,6 @@ main = hspec $ do
   describe "Image equality" $ do
     it "is reflexive" $ property $
       reflexivity
-  describe "Addition operation" $ do
-    it "is commutative" $ property $
-      plusCommutative
+  describe "Flip" $ do
+    it "gives identity when applied twice" $ property $
+      doubleFlipIsID
