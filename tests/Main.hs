@@ -13,9 +13,9 @@ import qualified Data.Vector.Storable as VS
 
 instance Arbitrary (Image PixelRGBA8) where
   arbitrary = do
-    l <- listOf (arbitrary :: Gen Word8)
-    w <- (arbitrary :: Gen Int)
-    h <- (arbitrary :: Gen Int)
+    l          <- listOf (arbitrary :: Gen Word8)
+    Positive w <- (arbitrary :: Gen (Positive Int))
+    Positive h <- (arbitrary :: Gen (Positive Int))
     return $ Image { imageWidth  = w
                    , imageHeight = h
                    , imageData   = VS.fromList l
