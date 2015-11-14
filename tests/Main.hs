@@ -6,8 +6,10 @@ module Main where
 import Test.Hspec
 import Test.QuickCheck
 import Data.Word (Word8)
-import Codec.Picture (PixelRGBA8(..), Image(..), pixelAt, PixelBaseComponent(..))
-import Control.Applicative
+import Codec.Picture ( PixelRGBA8(..)
+                     , Image(..)
+                     , pixelAt
+                     , PixelBaseComponent(..))
 import qualified Transformations as T
 import qualified Data.Vector.Storable as VS
 
@@ -15,9 +17,8 @@ instance Arbitrary (Image PixelRGBA8) where
   arbitrary = do
     l          <- listOf (arbitrary :: Gen Word8)
     Positive w <- (arbitrary :: Gen (Positive Int))
-    Positive h <- (arbitrary :: Gen (Positive Int))
     return $ Image { imageWidth  = w
-                   , imageHeight = h
+                   , imageHeight = ((length l) `div` w `div` 4)
                    , imageData   = VS.fromList l
                    }
 
@@ -51,7 +52,12 @@ reflexivity :: Image PixelRGBA8 -> Bool
 reflexivity img = img == img
 
 doubleFlipIsID :: Image PixelRGBA8 -> Bool
-doubleFlipIsID img = (T.flip (T.flip  img)) == img
+doubleFlipIsID img = if    (imageWidth img) >= 1
+                        && (imageHeight img) >= 1
+                        && (pixsLength `rem` 4) == 0
+                        then (T.flipVertical (T.flipVertical  img)) == img
+                        else True
+  where pixsLength = (imageWidth img) * (imageHeight img)
 
 plusCommutative :: Int -> Int -> Bool
 plusCommutative x y = x + y == y + x
@@ -61,6 +67,6 @@ main = hspec $ do
   describe "Image equality" $ do
     it "is reflexive" $ property $
       reflexivity
-  describe "Flip" $ do
+  describe "flipVertical" $ do
     it "gives identity when applied twice" $ property $
       doubleFlipIsID

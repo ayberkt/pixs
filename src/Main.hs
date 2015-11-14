@@ -3,7 +3,6 @@ import System.Environment (getArgs)
 import Codec.Picture (readImage, writePng, DynamicImage(..))
 import Transformations
 
-
 main :: IO ()
 main = do
   -- TODO: There is probably a much better way of

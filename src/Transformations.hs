@@ -1,8 +1,17 @@
+{-# LANGUAGE FlexibleInstances, StandaloneDeriving #-}
+
 module Transformations where
 
+
 import Data.Word
-import Codec.Picture(PixelRGBA8(..), Image(..), Pixel, pixelMap
-                    ,imageHeight, imageWidth, pixelAt, generateImage)
+import Codec.Picture( PixelRGBA8(..)
+                    , Image(..)
+                    , Pixel
+                    , pixelMap
+                    , imageHeight
+                    , imageWidth
+                    , pixelAt
+                    , generateImage)
 
 addColors :: Word8 -> Word8 -> Word8
 addColors c1 c2
