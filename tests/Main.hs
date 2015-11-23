@@ -38,6 +38,14 @@ genPixel = do
      d ← arbitrary ∷ Gen Word8
      return [a,b,c,d]
 
+instance Arbitrary PixelRGBA8 where
+  arbitrary = do
+    r ← arbitrary ∷ Gen Word8
+    g ← arbitrary ∷ Gen Word8
+    b ← arbitrary ∷ Gen Word8
+    a ← arbitrary ∷ Gen Word8
+    return $ PixelRGBA8 r g b a
+
 
 deriving instance Eq (Image PixelRGBA8)
 deriving instance Show (Image PixelRGBA8)
@@ -51,8 +59,11 @@ prop_double_flip_ID img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
                           else True
   where pixsLength = (imageWidth img) * (imageHeight img)
 
-plusCommutative :: Int -> Int -> Bool
-plusCommutative x y = x + y == y + x
+prop_pixel_add_comm ∷ PixelRGBA8 → PixelRGBA8 → Bool
+prop_pixel_add_comm p₁ p₂ = p₁ + p₂ == p₂ + p₁
+
+prop_pixel_add_assoc ∷ PixelRGBA8 → PixelRGBA8 → PixelRGBA8 → Bool
+prop_pixel_add_assoc p₁ p₂ p₃ = (p₁ + p₂) + p₃ == p₁ + (p₂ + p₃)
 
 main :: IO ()
 main = hspec $ do
@@ -63,6 +74,10 @@ main = hspec $ do
     it "gives identity when applied twice" $ property $
       prop_double_flip_ID
   describe "Pixel addition" $ do
+    it "is commutative" $ property $
+      prop_pixel_add_comm
+    it "is associative" $ property $
+      prop_pixel_add_assoc
     it "can add two arbitrary pixels." $
       let p₁ = PixelRGBA8 20 20 20 20
           p₂ = PixelRGBA8 30 30 30 30
