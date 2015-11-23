@@ -4,6 +4,7 @@
 {-# LANGUAGE UnicodeSyntax #-}
 
 module Main where
+
 import Test.Hspec
 import Test.QuickCheck
 import Data.Word (Word8)
@@ -61,3 +62,8 @@ main = hspec $ do
   describe "flipVertical" $ do
     it "gives identity when applied twice" $ property $
       prop_double_flip_ID
+  describe "Pixel addition" $ do
+    it "can add two arbitrary pixels." $
+      let p₁ = PixelRGBA8 20 20 20 20
+          p₂ = PixelRGBA8 30 30 30 30
+      in p₁ + p₂ `shouldBe` PixelRGBA8 50 50 50 255
