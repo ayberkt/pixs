@@ -41,37 +41,13 @@ genPixel = do
 deriving instance Eq (Image PixelRGBA8)
 deriving instance Show (Image PixelRGBA8)
 
--- instance Eq (Image PixelRGBA8) where
---   img1 == img2
---     | (width1 < 0) || (width2 < 0)
---       = True
---     | (height1 < 0) || (height2 < 0)
---       = True
---     | (width1 == 0) && (width2 == 0)
---       = True
---     | (height1 == 0) && (height2 == 0)
---       = True
---     | width1 /= width2
---       = False
---     | height1 /= height2
---       = False
---     | otherwise = all id [(foo img1 img2 x y) | x <- [0..width1]
---                                               , y <- [0..height1]]
---     where width1  = imageWidth  img1
---           width2  = imageWidth  img2
---           height1 = imageHeight img1
---           height2 = imageHeight img2
---           foo p q x y = (pixelAt p x y) == (pixelAt q x y)
-
 prop_reflexivity :: Image PixelRGBA8 -> Bool
 prop_reflexivity img = img == img
 
 prop_double_flip_ID :: Image PixelRGBA8 -> Bool
-prop_double_flip_ID img = if    (imageWidth img) >= 1
-                        && (imageHeight img) >= 1
-                        && (pixsLength `rem` 4) == 0
-                        then (T.flipVertical (T.flipVertical  img)) == img
-                        else True
+prop_double_flip_ID img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
+                          then (T.flipVertical (T.flipVertical  img)) == img
+                          else True
   where pixsLength = (imageWidth img) * (imageHeight img)
 
 plusCommutative :: Int -> Int -> Bool
