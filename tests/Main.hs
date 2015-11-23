@@ -50,10 +50,10 @@ instance Arbitrary PixelRGBA8 where
 deriving instance Eq (Image PixelRGBA8)
 deriving instance Show (Image PixelRGBA8)
 
-prop_reflexivity :: Image PixelRGBA8 -> Bool
+prop_reflexivity ∷ Image PixelRGBA8 → Bool
 prop_reflexivity img = img == img
 
-prop_double_flip_ID :: Image PixelRGBA8 -> Bool
+prop_double_flip_ID ∷ Image PixelRGBA8 → Bool
 prop_double_flip_ID img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
                           then (T.flipVertical (T.flipVertical  img)) == img
                           else True
@@ -65,7 +65,7 @@ prop_pixel_add_comm p₁ p₂ = p₁ + p₂ == p₂ + p₁
 prop_pixel_add_assoc ∷ PixelRGBA8 → PixelRGBA8 → PixelRGBA8 → Bool
 prop_pixel_add_assoc p₁ p₂ p₃ = (p₁ + p₂) + p₃ == p₁ + (p₂ + p₃)
 
-main :: IO ()
+main ∷ IO ()
 main = hspec $ do
   describe "Image equality" $ do
     it "is reflexive" $ property $
