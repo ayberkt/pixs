@@ -13,25 +13,30 @@ import Codec.Picture( PixelRGBA8(..)
                     , pixelAt
                     , generateImage)
 
-addColors :: Word8 -> Word8 -> Word8
-addColors c1 c2
-  | overflow  = 255
-  | otherwise = fromIntegral (intC1 + intC2)
-  where intC1 = (fromIntegral c1) :: Int
-        intC2 = (fromIntegral c2) :: Int
-        overflow = (intC1 + intC2) > 255
-
 instance Num PixelRGBA8 where
+
 
   negate (PixelRGBA8 r g b _) = PixelRGBA8 r' g' b' 255
     where r' = 255 - r
           g' = 255 - g
           b' = 255 - b
 
-  (PixelRGBA8 r1 g1 b1 _) + (PixelRGBA8 r2 g2 b2 _) = (PixelRGBA8 r' g' b' 255)
-    where r' = addColors r1 r2
-          g' = addColors g1 g2
-          b' = addColors b1 b2
+
+  (PixelRGBA8 r1 g1 b1 _) + (PixelRGBA8 r2 g2 b2 _) = (PixelRGBA8 r g b 255)
+    where r' = (fromIntegral r1 + fromIntegral r2) :: Int
+          g' = (fromIntegral g1 + fromIntegral g2) :: Int
+          b' = (fromIntegral b1 + fromIntegral b2) :: Int
+          r  = fromIntegral $ min 255 r' :: Word8
+          g  = fromIntegral $ min 255 g' :: Word8
+          b  = fromIntegral $ min 255 b' :: Word8
+
+  (PixelRGBA8 r1 g1 b1 _) - (PixelRGBA8 r2 g2 b2 _) = PixelRGBA8 r g b 255
+    where r' = (fromIntegral r1 - fromIntegral r2) :: Int
+          g' = (fromIntegral g1 - fromIntegral g2) :: Int
+          b' = (fromIntegral b1 - fromIntegral b2) :: Int
+          r  = fromIntegral $ max 0 r' :: Word8
+          g  = fromIntegral $ max 0 g' :: Word8
+          b  = fromIntegral $ max 0 b' :: Word8
 
   _ * _ = undefined
   abs _ = undefined

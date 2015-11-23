@@ -9,9 +9,7 @@ import Test.Hspec
 import Test.QuickCheck
 import Data.Word (Word8)
 import Codec.Picture ( PixelRGBA8(..)
-                     , Image(..)
-                     , pixelAt
-                     , PixelBaseComponent(..))
+                     , Image(..))
 import qualified Transformations as T
 import qualified Data.Vector.Storable as VS
 import Control.Monad (replicateM)
@@ -57,7 +55,6 @@ prop_double_flip_ID ∷ Image PixelRGBA8 → Bool
 prop_double_flip_ID img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
                           then (T.flipVertical (T.flipVertical  img)) == img
                           else True
-  where pixsLength = (imageWidth img) * (imageHeight img)
 
 prop_pixel_add_comm ∷ PixelRGBA8 → PixelRGBA8 → Bool
 prop_pixel_add_comm p₁ p₂ = p₁ + p₂ == p₂ + p₁
@@ -78,7 +75,16 @@ main = hspec $ do
       prop_pixel_add_comm
     it "is associative" $ property $
       prop_pixel_add_assoc
-    it "can add two arbitrary pixels." $
+    it "correctly adds two arbitrary pixels" $
       let p₁ = PixelRGBA8 20 20 20 20
           p₂ = PixelRGBA8 30 30 30 30
       in p₁ + p₂ `shouldBe` PixelRGBA8 50 50 50 255
+    it "handles overflow" $
+      let p₁ = PixelRGBA8 250 250 250 250
+          p₂ = PixelRGBA8 20  20  20  20
+      in p₁ + p₂ `shouldBe` PixelRGBA8 255 255 255 255
+  describe "Pixel subtraction" $ do
+    it "handles underflow" $
+      let p₁ = PixelRGBA8 5 5 5 5
+          p₂ = PixelRGBA8 20  20  20  20
+      in p₁ - p₂ `shouldBe` PixelRGBA8 0 0 0 255
