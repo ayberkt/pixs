@@ -1,2 +1,2 @@
 ghc: 7.10
-script: ./test
+script: cabal configure --enable-tests && cabal build && ./dist/build/spec/spec
