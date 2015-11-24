@@ -70,9 +70,9 @@ prop_pixel_add_assoc ∷ PixelRGBA8 → PixelRGBA8 → PixelRGBA8 → Bool
 prop_pixel_add_assoc p₁ p₂ p₃ = (p₁ + p₂) + p₃ == p₁ + (p₂ + p₃)
 
 
-prop_change_red_ID ∷ Image PixelRGBA8 → Bool
-prop_change_red_ID img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
-                         then (T.changeRed 20 (T.changeRed (-20) img)) == img
+prop_change_red_ID ∷ Int → Image PixelRGBA8 → Bool
+prop_change_red_ID x img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
+                         then (T.changeRed x (T.changeRed (-x) img)) == img
                          else True
 
 main ∷ IO ()
@@ -112,5 +112,5 @@ main = hspec $ do
       let p = PixelRGBA8 250 250 250 250
       in (negate p) `shouldBe` PixelRGBA8 5 5 5 255
   describe "Red adjustment" $ do
-    it "test case" $ property $
+    it "Gives ID when applied twice with x and -x" $ property $
       prop_change_red_ID
