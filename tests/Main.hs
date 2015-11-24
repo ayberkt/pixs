@@ -80,6 +80,9 @@ main = hspec $ do
   describe "flipHorizontal" $ do
     it "gives identity when applied twice" $ property $
       double_apply_ID T.flipHorizontal
+  describe "flip" $ do
+    it "gives identity when applied twice" $ property $
+      double_apply_ID T.flip
   describe "Pixel addition" $ do
     it "is commutative" $ property $
       prop_pixel_add_comm
