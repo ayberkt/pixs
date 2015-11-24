@@ -101,3 +101,7 @@ main = hspec $ do
       let p₁ = PixelRGBA8 5 5 5 5
           p₂ = PixelRGBA8 20  20  20  20
       in p₁ - p₂ `shouldBe` PixelRGBA8 0 0 0 255
+  describe "Pixel negation" $ do
+    it "handles normal case" $
+      let p = PixelRGBA8 250 250 250 250
+      in (negate p) `shouldBe` PixelRGBA8 5 5 5 255
