@@ -69,6 +69,12 @@ prop_pixel_add_comm p₁ p₂ = p₁ + p₂ == p₂ + p₁
 prop_pixel_add_assoc ∷ PixelRGBA8 → PixelRGBA8 → PixelRGBA8 → Bool
 prop_pixel_add_assoc p₁ p₂ p₃ = (p₁ + p₂) + p₃ == p₁ + (p₂ + p₃)
 
+
+prop_change_red_ID ∷ Image PixelRGBA8 → Bool
+prop_change_red_ID img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
+                         then (T.changeRed 20 (T.changeRed (-20) img)) == img
+                         else True
+
 main ∷ IO ()
 main = hspec $ do
   describe "Image equality" $ do
@@ -105,3 +111,6 @@ main = hspec $ do
     it "handles normal case" $
       let p = PixelRGBA8 250 250 250 250
       in (negate p) `shouldBe` PixelRGBA8 5 5 5 255
+  describe "Red adjustment" $ do
+    it "test case" $ property $
+      prop_change_red_ID
