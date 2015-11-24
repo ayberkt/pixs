@@ -56,6 +56,13 @@ prop_double_flip_ID img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
                           then (T.flipVertical (T.flipVertical  img)) == img
                           else True
 
+double_apply_ID :: (Image PixelRGBA8 -> Image PixelRGBA8)
+                -> Image PixelRGBA8
+                -> Bool
+double_apply_ID f img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
+                          then (f $ f img) == img
+                          else True
+
 prop_pixel_add_comm ∷ PixelRGBA8 → PixelRGBA8 → Bool
 prop_pixel_add_comm p₁ p₂ = p₁ + p₂ == p₂ + p₁
 
@@ -69,7 +76,10 @@ main = hspec $ do
       prop_reflexivity
   describe "flipVertical" $ do
     it "gives identity when applied twice" $ property $
-      prop_double_flip_ID
+      double_apply_ID T.flipVertical
+  describe "flipHorizontal" $ do
+    it "gives identity when applied twice" $ property $
+      double_apply_ID T.flipHorizontal
   describe "Pixel addition" $ do
     it "is commutative" $ property $
       prop_pixel_add_comm
