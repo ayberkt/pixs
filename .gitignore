@@ -1,0 +1,7 @@
+*.png
+.cabal-sandbox/
+*.sh
+*.config
+dist/
+Setup.hs
+pixs
