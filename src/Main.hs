@@ -15,37 +15,37 @@ main = do
       case image of
           ImageRGBA8 img ->
             case args of
-              ("brightness":_:amount:outFile:[])
+              ["brightness",_,amount,outFile]
                 -> writePng outFile
                    $ changeBrightness (read amount) img
-              ("red":_:amount:outFile:[])
+              ["red",_,amount,outFile]
                 -> writePng outFile
                    $ changeRed (read amount) img
-              ("green":_:amount:outFile:[])
+              ["green",_,amount,outFile]
                 -> writePng outFile
                    $ changeGreen (read amount) img
-              ("flipVertical":_:outFile:[])
+              ["flipVertical",_,outFile]
                  -> writePng outFile
                     $ flipVertical img
-              ("flipHorizontal":_:outFile:[])
+              ["flipHorizontal",_,outFile]
                  -> writePng outFile
                     $ flipHorizontal img
-              ("flip":_:outFile:[])
+              ["flip",_,outFile]
                 -> writePng outFile
                    $ flip img
-              ("blur":_:outFile:[])
+              ["blur",_,outFile]
                 -> writePng outFile
                    $ blur img
               _ -> putStrLn "Please enter valid arguments."
           ImageRGB8 img ->
             case args of
-              ("flip":_:outFile:[])
+              ["flip",_,outFile]
                 -> writePng outFile
                    $ flip img
-              ("flipHorizontal":_:outFile:[])
+              ["flipHorizontal",_,outFile]
                 -> writePng outFile
                    $ flipHorizontal img
-              ("flipVertical":_:outFile:[])
+              ["flipVertical",_,outFile]
                 -> writePng outFile
                    $ flipVertical img
               _ -> putStrLn "Please enter valid arguments."
