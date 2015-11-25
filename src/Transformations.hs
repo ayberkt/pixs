@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleInstances  #-}
-{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE UnicodeSyntax      #-}
 
 module Transformations where
@@ -24,7 +23,7 @@ instance Num PixelRGBA8 where
           b' = 255 - b
 
 
-  (PixelRGBA8 r1 g1 b1 _) + (PixelRGBA8 r2 g2 b2 _) = (PixelRGBA8 r g b 255)
+  (PixelRGBA8 r1 g1 b1 _) + (PixelRGBA8 r2 g2 b2 _) = PixelRGBA8 r g b 255
     where r' = (fromIntegral r1 + fromIntegral r2) ∷ Int
           g' = (fromIntegral g1 + fromIntegral g2) ∷ Int
           b' = (fromIntegral b1 + fromIntegral b2) ∷ Int
@@ -72,7 +71,7 @@ changeGreen amount = pixelMap changeGreen'
 
 flipVertical ∷ Pixel a ⇒ Image a → Image a
 flipVertical img =  generateImage complement (imageWidth img) (imageHeight img)
-  where complement x y = pixelAt img x ((imageHeight img) - y - 1)
+  where complement x y = pixelAt img x (imageHeight img - y - 1)
 
 flipHorizontal ∷ Pixel a ⇒ Image a → Image a
 flipHorizontal img = generateImage complement (imageWidth img) (imageHeight img)
