@@ -20,7 +20,7 @@ executable pixels
   other-modules:       Transformations
   -- other-extensions:
   ghc-options:         -Wall -W
-  build-depends:       base < 4.9
+  build-depends:       base
                      , JuicyPixels >= 3.2
   hs-source-dirs:      src
   default-language:    Haskell2010
