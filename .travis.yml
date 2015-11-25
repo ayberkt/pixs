@@ -1,2 +1,4 @@
 ghc: 7.10
+language: haskell
+sudo: false
 script: cabal configure --enable-tests && cabal build && ./dist/build/spec/spec
