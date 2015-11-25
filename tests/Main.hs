@@ -60,8 +60,8 @@ double_apply_ID :: (Image PixelRGBA8 -> Image PixelRGBA8)
                 -> Image PixelRGBA8
                 -> Bool
 double_apply_ID f img = if imageWidth img >= 0 && imageHeight img >= 0
-                          then (f $ f img) == img
-                          else True
+                        then (f $ f img) == img
+                        else True
 
 prop_pixel_add_comm ∷ PixelRGBA8 → PixelRGBA8 → Bool
 prop_pixel_add_comm p₁ p₂ = p₁ + p₂ == p₂ + p₁
@@ -72,8 +72,8 @@ prop_pixel_add_assoc p₁ p₂ p₃ = (p₁ + p₂) + p₃ == p₁ + (p₂ + p�
 
 prop_change_red_ID ∷ Int → Image PixelRGBA8 → Bool
 prop_change_red_ID x img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
-                         then T.changeRed x (T.changeRed (-x) img) == img
-                         else True
+                           then T.changeRed x (T.changeRed (-x) img) == img
+                           else True
 
 main ∷ IO ()
 main = hspec $ do
