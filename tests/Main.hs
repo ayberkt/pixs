@@ -16,17 +16,17 @@ import Control.Monad (replicateM)
 
 instance Arbitrary (Image PixelRGBA8) where
   arbitrary = do
-    Positive size ← (arbitrary ∷ Gen (Positive Int))
+    Positive size ← arbitrary ∷ Gen (Positive Int)
     pixs          ← listOfSize size
     Positive w    ← arbitrary ∷ Gen (Positive Int)
     let w' = w `rem` size-1
-    return $ Image { imageWidth  = w'
-                   , imageHeight = w' `div` size-1
-                   , imageData   = VS.fromList pixs
-                   }
+    return Image { imageWidth  = w'
+                 , imageHeight = w' `div` size-1
+                 , imageData   = VS.fromList pixs
+                 }
 
 listOfSize ∷ Int → Gen [Word8]
-listOfSize x = fmap concat $ replicateM x genPixel
+listOfSize x = concat <$> replicateM x genPixel
 
 genPixel ∷ Gen [Word8]
 genPixel = do
@@ -52,14 +52,14 @@ prop_reflexivity ∷ Image PixelRGBA8 → Bool
 prop_reflexivity img = img == img
 
 prop_double_flip_ID ∷ Image PixelRGBA8 → Bool
-prop_double_flip_ID img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
-                          then (T.flipVertical (T.flipVertical  img)) == img
+prop_double_flip_ID img = if imageWidth img >= 0 && imageHeight img >= 0
+                          then T.flipVertical (T.flipVertical  img) == img
                           else True
 
 double_apply_ID :: (Image PixelRGBA8 -> Image PixelRGBA8)
                 -> Image PixelRGBA8
                 -> Bool
-double_apply_ID f img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
+double_apply_ID f img = if imageWidth img >= 0 && imageHeight img >= 0
                           then (f $ f img) == img
                           else True
 
@@ -72,13 +72,13 @@ prop_pixel_add_assoc p₁ p₂ p₃ = (p₁ + p₂) + p₃ == p₁ + (p₂ + p�
 
 prop_change_red_ID ∷ Int → Image PixelRGBA8 → Bool
 prop_change_red_ID x img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
-                         then (T.changeRed x (T.changeRed (-x) img)) == img
+                         then T.changeRed x (T.changeRed (-x) img) == img
                          else True
 
 main ∷ IO ()
 main = hspec $ do
   describe "Image equality" $ do
-    it "is reflexive" $ property $
+    it "is reflexive" $ property
       prop_reflexivity
   describe "flipVertical" $ do
     it "gives identity when applied twice" $ property $
@@ -90,9 +90,9 @@ main = hspec $ do
     it "gives identity when applied twice" $ property $
       double_apply_ID T.flip
   describe "Pixel addition" $ do
-    it "is commutative" $ property $
+    it "is commutative" $ property
       prop_pixel_add_comm
-    it "is associative" $ property $
+    it "is associative" $ property
       prop_pixel_add_assoc
     it "correctly adds two arbitrary pixels" $
       let p₁ = PixelRGBA8 20 20 20 20
@@ -102,15 +102,15 @@ main = hspec $ do
       let p₁ = PixelRGBA8 250 250 250 250
           p₂ = PixelRGBA8 20  20  20  20
       in p₁ + p₂ `shouldBe` PixelRGBA8 255 255 255 255
-  describe "Pixel subtraction" $ do
+  describe "Pixel subtraction" $
     it "handles underflow" $
       let p₁ = PixelRGBA8 5 5 5 5
           p₂ = PixelRGBA8 20  20  20  20
       in p₁ - p₂ `shouldBe` PixelRGBA8 0 0 0 255
-  describe "Pixel negation" $ do
+  describe "Pixel negation" $
     it "handles normal case" $
       let p = PixelRGBA8 250 250 250 250
-      in (negate p) `shouldBe` PixelRGBA8 5 5 5 255
-  describe "Red adjustment" $ do
+      in negate p `shouldBe` PixelRGBA8 5 5 5 255
+  describe "Red adjustment" $
     it "Gives ID when applied twice with x and -x" $ property $
       prop_change_red_ID
