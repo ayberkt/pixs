@@ -26,7 +26,7 @@ instance Arbitrary (Image PixelRGBA8) where
                  }
 
 listOfSize ∷ Int → Gen [Word8]
-listOfSize x = concat <$> replicateM x genPixel
+listOfSize x = fmap concat $ replicateM x genPixel
 
 genPixel ∷ Gen [Word8]
 genPixel = do
