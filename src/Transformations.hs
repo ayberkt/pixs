@@ -55,18 +55,15 @@ instance Num PixelRGBA8 where
   fromInteger _ = undefined
 
 -- | Flow-checked addition operation which we denote with ⊕
-(⊕) ∷ Integral a ⇒ Word8 → a → Word8
+(⊕) ∷ Word8 → Int → Word8
 (⊕) x y = fromIntegral . max 0 . min 255
               $ (fromIntegral x) + (fromIntegral y)
 
 fieldAdd ∷ Int → PixelRGBA8 → PixelRGBA8
-fieldAdd x (PixelRGBA8 r g b a) = PixelRGBA8 r'' g'' b'' a
-  where r' = (fromIntegral r ∷ Int) + x
-        g' = (fromIntegral g ∷ Int) + x
-        b' = (fromIntegral b ∷ Int) + x
-        r'' = fromIntegral . max 0 . min 255 $ r' ∷ Word8
-        g'' = fromIntegral . max 0 . min 255 $ g' ∷ Word8
-        b'' = fromIntegral . max 0 . min 255 $ b' ∷ Word8
+fieldAdd x (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
+  where r' = r ⊕ x
+        g' = g ⊕ x
+        b' = b ⊕ x
 
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
