@@ -9,7 +9,8 @@ import Test.Hspec
 import Test.QuickCheck
 import Data.Word (Word8)
 import Codec.Picture ( PixelRGBA8(..)
-                     , Image(..))
+                     , Image(..)
+                     , pixelAt)
 import qualified Transformations as T
 import qualified Data.Vector.Storable as VS
 import Control.Monad (replicateM)
@@ -75,6 +76,15 @@ prop_change_red_ID x img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
                            then T.changeRed x (T.changeRed (-x) img) == img
                            else True
 
+prop_red_correct ∷ Int → Positive Int → Positive Int → Image PixelRGBA8 → Bool
+prop_red_correct a (Positive x) (Positive y) img
+  = if (imageWidth img)  >= 0 && (imageHeight img) >= 0
+    then let (PixelRGBA8 r _ _ _)  = pixelAt img x y
+             newImg                = T.changeRed a img
+             (PixelRGBA8 r' _ _ _) = pixelAt newImg x y
+         in r' == (r `T.safeAdd` x)
+    else True
+
 main ∷ IO ()
 main = hspec $ do
   describe "Image equality" $ do
@@ -111,7 +121,9 @@ main = hspec $ do
     it "handles normal case" $
       let p = PixelRGBA8 250 250 250 250
       in negate p `shouldBe` PixelRGBA8 5 5 5 255
-  describe "Red adjustment" $
+  describe "Red adjustment" $ do
+    it "is correct" $ property $
+      prop_red_correct
     it "Gives ID when applied twice with x and -x" $ property $
       prop_change_red_ID
   describe "Field addition" $ do
