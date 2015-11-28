@@ -29,6 +29,12 @@ applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
         g  = fromIntegral . max 0 . min 255 $ g'   ∷ Word8
         b  = fromIntegral . max 0 . min 255 $ b'   ∷ Word8
 
+-- | TODO: PixelRGBA8 should not really have an instance of
+--   Num since it doesn't really behave like a number. For
+--   now we declare a num instance for the convenience of
+--   being able to use (+), (-) etc... It would be the best
+--   it were a VectorSpace if a VectorSpace typeclass exists
+--   somewhere. Or maybe, that's too much; I don't know.
 instance Num PixelRGBA8 where
 
   negate (PixelRGBA8 r g b _) = PixelRGBA8 r' g' b' 255
@@ -41,6 +47,12 @@ instance Num PixelRGBA8 where
   (-) = applyOp (-)
 
   (*) = applyOp (*)
+
+  abs p = p
+
+  signum p = p
+
+  fromInteger _ = undefined
 
 fieldAdd ∷ Int → PixelRGBA8 → PixelRGBA8
 fieldAdd x (PixelRGBA8 r g b a) = PixelRGBA8 r'' g'' b'' a
