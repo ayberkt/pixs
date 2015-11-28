@@ -126,13 +126,3 @@ main = hspec $ do
       prop_red_correct
     it "Gives ID when applied twice with x and -x" $ property $
       prop_change_red_ID
-  describe "Field addition" $ do
-    it "handles normal cases" $
-      let p = PixelRGBA8 5 5 5 5
-      in (40 `T.fieldAdd` p) `shouldBe` PixelRGBA8 45 45 45 5
-    it "handles overflow" $
-      let p = PixelRGBA8 250 250 250 250
-      in (50 `T.fieldAdd` p) `shouldBe` PixelRGBA8 255 255 255 250
-    it "handles underflow" $
-      let p = PixelRGBA8 5 5 5 5
-      in ((-50) `T.fieldAdd` p) `shouldBe` PixelRGBA8 0 0 0 5
