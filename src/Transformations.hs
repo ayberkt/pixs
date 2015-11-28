@@ -39,10 +39,23 @@ instance Num PixelRGBA8 where
           g  = fromIntegral $ max 0 g' ∷ Word8
           b  = fromIntegral $ max 0 b' ∷ Word8
 
-  _ * _ = undefined
-  abs _ = undefined
-  fromInteger _ = undefined
-  signum _ = undefined
+  (PixelRGBA8 r₁ g₁ b₁ a₁) * (PixelRGBA8 r₂ g₂ b₂ a₂)
+    = PixelRGBA8 r g b (max a₁ a₂)
+    where r' = (fromIntegral r₁ * fromIntegral r₂) ∷ Int
+          g' = (fromIntegral g₁ * fromIntegral g₂) ∷ Int
+          b' = (fromIntegral b₁ * fromIntegral b₂) ∷ Int
+          r  = fromIntegral . max 0 . min 255 $ r' ∷ Word8
+          g  = fromIntegral . max 0 . min 255 $ g' ∷ Word8
+          b  = fromIntegral . max 0 . min 255 $ b' ∷ Word8
+
+fieldAdd ∷ Int → PixelRGBA8 → PixelRGBA8
+fieldAdd x (PixelRGBA8 r g b a) = PixelRGBA8 r'' g'' b'' a
+  where r' = (fromIntegral r ∷ Int) + x
+        g' = (fromIntegral g ∷ Int) + x
+        b' = (fromIntegral b ∷ Int) + x
+        r'' = fromIntegral . max 0 . min 255 $ r' ∷ Word8
+        g'' = fromIntegral . max 0 . min 255 $ g' ∷ Word8
+        b'' = fromIntegral . max 0 . min 255 $ b' ∷ Word8
 
 -- TODO: this will no longer be useful when pixel
 -- algebra is fully implemented.
