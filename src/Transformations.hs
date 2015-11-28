@@ -14,8 +14,22 @@ import Codec.Picture( PixelRGBA8(..)
                     , pixelAt
                     , generateImage)
 
-instance Num PixelRGBA8 where
+-- | This will be used for reducing repetition when declaring Num instance.
+--   Our strategy for overflow/underflow checking is the same for all of the
+--   operations so we define this function that takes in an operation and two
+--   pixels and applies the operation to the components. Pixel addition for
+--   example is implemented by simply passing (+) to `applyOp`.
+applyOp ∷ (Int → Int → Int) → PixelRGBA8 → PixelRGBA8 → PixelRGBA8
+applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
+  = PixelRGBA8 r g b (max a₁ a₂)
+  where r' = (fromIntegral r₁ `op` fromIntegral r₂)
+        g' = (fromIntegral g₁ `op` fromIntegral g₂)
+        b' = (fromIntegral b₁ `op` fromIntegral b₂)
+        r  = fromIntegral . max 0 . min 255 $ r'   ∷ Word8
+        g  = fromIntegral . max 0 . min 255 $ g'   ∷ Word8
+        b  = fromIntegral . max 0 . min 255 $ b'   ∷ Word8
 
+instance Num PixelRGBA8 where
 
   negate (PixelRGBA8 r g b _) = PixelRGBA8 r' g' b' 255
     where r' = 255 - r
@@ -23,30 +37,11 @@ instance Num PixelRGBA8 where
           b' = 255 - b
 
 
-  (PixelRGBA8 r1 g1 b1 _) + (PixelRGBA8 r2 g2 b2 _) = PixelRGBA8 r g b 255
-    where r' = (fromIntegral r1 + fromIntegral r2) ∷ Int
-          g' = (fromIntegral g1 + fromIntegral g2) ∷ Int
-          b' = (fromIntegral b1 + fromIntegral b2) ∷ Int
-          r  = fromIntegral $ min 255 r' ∷ Word8
-          g  = fromIntegral $ min 255 g' ∷ Word8
-          b  = fromIntegral $ min 255 b' ∷ Word8
+  (+) = applyOp (+)
 
-  (PixelRGBA8 r1 g1 b1 _) - (PixelRGBA8 r2 g2 b2 _) = PixelRGBA8 r g b 255
-    where r' = (fromIntegral r1 - fromIntegral r2) ∷ Int
-          g' = (fromIntegral g1 - fromIntegral g2) ∷ Int
-          b' = (fromIntegral b1 - fromIntegral b2) ∷ Int
-          r  = fromIntegral $ max 0 r' ∷ Word8
-          g  = fromIntegral $ max 0 g' ∷ Word8
-          b  = fromIntegral $ max 0 b' ∷ Word8
+  (-) = applyOp (-)
 
-  (PixelRGBA8 r₁ g₁ b₁ a₁) * (PixelRGBA8 r₂ g₂ b₂ a₂)
-    = PixelRGBA8 r g b (max a₁ a₂)
-    where r' = (fromIntegral r₁ * fromIntegral r₂) ∷ Int
-          g' = (fromIntegral g₁ * fromIntegral g₂) ∷ Int
-          b' = (fromIntegral b₁ * fromIntegral b₂) ∷ Int
-          r  = fromIntegral . max 0 . min 255 $ r' ∷ Word8
-          g  = fromIntegral . max 0 . min 255 $ g' ∷ Word8
-          b  = fromIntegral . max 0 . min 255 $ b' ∷ Word8
+  (*) = applyOp (*)
 
 fieldAdd ∷ Int → PixelRGBA8 → PixelRGBA8
 fieldAdd x (PixelRGBA8 r g b a) = PixelRGBA8 r'' g'' b'' a

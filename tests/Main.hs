@@ -97,16 +97,16 @@ main = hspec $ do
     it "correctly adds two arbitrary pixels" $
       let p₁ = PixelRGBA8 20 20 20 20
           p₂ = PixelRGBA8 30 30 30 30
-      in p₁ + p₂ `shouldBe` PixelRGBA8 50 50 50 255
+      in p₁ + p₂ `shouldBe` PixelRGBA8 50 50 50 30
     it "handles overflow" $
       let p₁ = PixelRGBA8 250 250 250 250
           p₂ = PixelRGBA8 20  20  20  20
-      in p₁ + p₂ `shouldBe` PixelRGBA8 255 255 255 255
+      in p₁ + p₂ `shouldBe` PixelRGBA8 255 255 255 250
   describe "Pixel subtraction" $
     it "handles underflow" $
       let p₁ = PixelRGBA8 5 5 5 5
           p₂ = PixelRGBA8 20  20  20  20
-      in p₁ - p₂ `shouldBe` PixelRGBA8 0 0 0 255
+      in p₁ - p₂ `shouldBe` PixelRGBA8 0 0 0 20
   describe "Pixel negation" $
     it "handles normal case" $
       let p = PixelRGBA8 250 250 250 250
@@ -114,3 +114,13 @@ main = hspec $ do
   describe "Red adjustment" $
     it "Gives ID when applied twice with x and -x" $ property $
       prop_change_red_ID
+  describe "Field addition" $ do
+    it "handles normal cases" $
+      let p = PixelRGBA8 5 5 5 5
+      in (40 `T.fieldAdd` p) `shouldBe` PixelRGBA8 45 45 45 5
+    it "handles overflow" $
+      let p = PixelRGBA8 250 250 250 250
+      in (50 `T.fieldAdd` p) `shouldBe` PixelRGBA8 255 255 255 250
+    it "handles underflow" $
+      let p = PixelRGBA8 5 5 5 5
+      in ((-50) `T.fieldAdd` p) `shouldBe` PixelRGBA8 0 0 0 5
