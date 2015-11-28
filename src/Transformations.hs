@@ -14,7 +14,7 @@ import Codec.Picture( PixelRGBA8(..)
                     , pixelAt
                     , generateImage)
 
--- | This will be used for reducing repetition when declaring Num instance.
+-- | Used for reducing repetition when declaring Num instance.
 --   Our strategy for overflow/underflow checking is the same for all of the
 --   operations so we define this function that takes in an operation and two
 --   pixels and applies the operation to the components. Pixel addition for
@@ -56,14 +56,15 @@ instance Num PixelRGBA8 where
 
 -- | Flow-checked addition operation which we denote with ⊕.
 (⊕) ∷ Word8 → Int → Word8
-(⊕) x y = fromIntegral . max 0 . min 255
-              $ (fromIntegral x) + (fromIntegral y)
+(⊕) x y = fromIntegral . max 0 . min 255 $ (fromIntegral x) + (fromIntegral y)
 
-fieldAdd ∷ Int → PixelRGBA8 → PixelRGBA8
-fieldAdd x (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
-  where r' = r ⊕ x
-        g' = g ⊕ x
-        b' = b ⊕ x
+-- | Flow-checked multiplication operation.
+(⊗) ∷ Word8 → Int → Word8
+(⊗) x y = fromIntegral . max 0 . min 255 $ (fromIntegral x) * (fromIntegral y)
+
+-- | Scalar multiplication.
+scale ∷ Int → PixelRGBA8 → PixelRGBA8
+scale n (PixelRGBA8 r g b a) = PixelRGBA8 (r ⊗ n) (g ⊗ n) (b ⊗ n) a
 
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
