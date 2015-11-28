@@ -82,7 +82,7 @@ prop_red_correct a (Positive x) (Positive y) img
     then let (PixelRGBA8 r _ _ _)  = pixelAt img x y
              newImg                = T.changeRed a img
              (PixelRGBA8 r' _ _ _) = pixelAt newImg x y
-         in r' == (r `T.safeAdd` x)
+         in r' == (r T.⊕ x)
     else True
 
 main ∷ IO ()

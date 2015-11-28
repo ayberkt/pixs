@@ -54,8 +54,9 @@ instance Num PixelRGBA8 where
 
   fromInteger _ = undefined
 
-safeAdd ∷ Integral a ⇒ Word8 → a → Word8
-safeAdd x y = fromIntegral . max 0 . min 255
+-- | Flow-checked addition operation which we denote with ⊕
+(⊕) ∷ Integral a ⇒ Word8 → a → Word8
+(⊕) x y = fromIntegral . max 0 . min 255
               $ (fromIntegral x) + (fromIntegral y)
 
 fieldAdd ∷ Int → PixelRGBA8 → PixelRGBA8
@@ -70,18 +71,18 @@ fieldAdd x (PixelRGBA8 r g b a) = PixelRGBA8 r'' g'' b'' a
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
   where changeBrightness' (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
-          where r' = r `safeAdd` amount
-                g' = g `safeAdd` amount
-                b' = b `safeAdd` amount
+          where r' = r ⊕ amount
+                g' = g ⊕ amount
+                b' = b ⊕ amount
 
 changeRed ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeRed amount = pixelMap changeRed'
-  where changeRed' (PixelRGBA8 r g b a) = PixelRGBA8 (r `safeAdd` amount) g b a
+  where changeRed' (PixelRGBA8 r g b a) = PixelRGBA8 (r ⊕ amount) g b a
 
 changeGreen ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeGreen amount = pixelMap changeGreen'
   where changeGreen' (PixelRGBA8 r g b a) = PixelRGBA8 r g' b a
-                                            where g' = g `safeAdd` amount
+                                            where g' = g ⊕ amount
 
 flipVertical ∷ Pixel a ⇒ Image a → Image a
 flipVertical img =  generateImage complement (imageWidth img) (imageHeight img)
