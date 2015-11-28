@@ -36,7 +36,6 @@ instance Num PixelRGBA8 where
           g' = 255 - g
           b' = 255 - b
 
-
   (+) = applyOp (+)
 
   (-) = applyOp (-)
