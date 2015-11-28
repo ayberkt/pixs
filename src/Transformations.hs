@@ -54,7 +54,7 @@ instance Num PixelRGBA8 where
 
   fromInteger _ = undefined
 
--- | Flow-checked addition operation which we denote with ⊕
+-- | Flow-checked addition operation which we denote with ⊕.
 (⊕) ∷ Word8 → Int → Word8
 (⊕) x y = fromIntegral . max 0 . min 255
               $ (fromIntegral x) + (fromIntegral y)
