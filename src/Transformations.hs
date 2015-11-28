@@ -54,6 +54,10 @@ instance Num PixelRGBA8 where
 
   fromInteger _ = undefined
 
+safeAdd ∷ Integral a ⇒ Word8 → a → Word8
+safeAdd x y = fromIntegral . max 0 . min 255
+              $ (fromIntegral x) + (fromIntegral y)
+
 fieldAdd ∷ Int → PixelRGBA8 → PixelRGBA8
 fieldAdd x (PixelRGBA8 r g b a) = PixelRGBA8 r'' g'' b'' a
   where r' = (fromIntegral r ∷ Int) + x
@@ -63,30 +67,21 @@ fieldAdd x (PixelRGBA8 r g b a) = PixelRGBA8 r'' g'' b'' a
         g'' = fromIntegral . max 0 . min 255 $ g' ∷ Word8
         b'' = fromIntegral . max 0 . min 255 $ b' ∷ Word8
 
--- TODO: this will no longer be useful when pixel
--- algebra is fully implemented.
-adjustBy ∷ (Num a, Integral a) ⇒ Word8 → a → Word8
-adjustBy x amount
-  | newVal > 255 = 255
-  | newVal < 0   = 0
-  | otherwise    = newVal
-  where newVal   = fromIntegral (x + fromIntegral amount)
-
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
   where changeBrightness' (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
-          where r' = r `adjustBy` amount
-                g' = g `adjustBy` amount
-                b' = b `adjustBy` amount
+          where r' = r `safeAdd` amount
+                g' = g `safeAdd` amount
+                b' = b `safeAdd` amount
 
 changeRed ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeRed amount = pixelMap changeRed'
-  where changeRed' (PixelRGBA8 r g b a) = PixelRGBA8 (r `adjustBy` amount) g b a
+  where changeRed' (PixelRGBA8 r g b a) = PixelRGBA8 (r `safeAdd` amount) g b a
 
 changeGreen ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeGreen amount = pixelMap changeGreen'
   where changeGreen' (PixelRGBA8 r g b a) = PixelRGBA8 r g' b a
-                                            where g' = g `adjustBy` amount
+                                            where g' = g `safeAdd` amount
 
 flipVertical ∷ Pixel a ⇒ Image a → Image a
 flipVertical img =  generateImage complement (imageWidth img) (imageHeight img)
