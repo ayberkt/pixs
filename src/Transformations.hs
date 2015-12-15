@@ -111,13 +111,16 @@ average pixs = let avg xs   = sum xs `div` length xs
 blur ∷  Image PixelRGBA8 → Image PixelRGBA8
 blur img = let black = PixelRGBA8 0 0 0 255
                neighbors x y
-                 | x <= 0 || y <= 0         = [black]
-                 | x >= imageWidth img - 2  = [black]
-                 | y >= imageHeight img - 2 = [black]
-                 | otherwise = [pixelAt img (x - i) (y - j) | i ← [-1..1], j ← [-1..1]]
-               blurPixel x y
-                 | x <= 0 || y <= 0         = black
-                 | x >= imageWidth img - 2  = black
-                 | y >= imageHeight img - 2 = black
-                 | otherwise = average (neighbors x y)
+                 | x == 0 || y == 0             = [pixelAt img x y]
+                 | xOutOfBounds && yOutOfBounds = [ pixelAt img x y
+                                                  , pixelAt img (x - 1) y
+                                                  , pixelAt img x (y - 1)
+                                                  , pixelAt img (x - 1) (y - 1)]
+                 | xOutOfBounds =  [pixelAt img x y]
+                 | yOutOfBounds = [pixelAt img x y]
+                 | otherwise = [pixelAt img (x - i) (y - j)
+                               | i ← [-1, 0, 1], j ← [-1, 0, 1]]
+                 where xOutOfBounds = x >= imageWidth  img - 1
+                       yOutOfBounds = y >= imageHeight img - 1
+               blurPixel x y = average (neighbors x y)
            in generateImage blurPixel (imageWidth img) (imageHeight img)
