@@ -108,7 +108,7 @@ average pixs = let avg xs   = sum xs `div` length xs
                                                 | (PixelRGBA8 _ _ b _) ← pixs]
                in PixelRGBA8 redAvg greenAvg blueAvg 255
 
-blur ∷ Image PixelRGBA8 → Image PixelRGBA8
+blur ∷  Image PixelRGBA8 → Image PixelRGBA8
 blur img = let black = PixelRGBA8 0 0 0 255
                neighbors x y
                  | x <= 0 || y <= 0         = [black]

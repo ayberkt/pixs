@@ -3,7 +3,7 @@
 import Prelude hiding (flip, error)
 import System.Environment (getArgs)
 import Codec.Picture (readImage, writePng, DynamicImage(..))
-import Transformations
+import qualified Transformations as T
 
 main ∷ IO ()
 main = do
@@ -19,37 +19,37 @@ main = do
             case args of
               ["brightness",_,amount,outFile]
                 → writePng outFile
-                   $ changeBrightness (read amount) img
+                    $ T.changeBrightness (read amount) img
               ["red",_,amount,outFile]
                 → writePng outFile
-                   $ changeRed (read amount) img
+                    $ T.changeRed (read amount) img
               ["green",_,amount,outFile]
                 → writePng outFile
-                   $ changeGreen (read amount) img
+                    $ T.changeGreen (read amount) img
               ["flipVertical",_,outFile]
-                 → writePng outFile
-                    $ flipVertical img
-              ["flipHorizontal",_,outFile]
-                 → writePng outFile
-                    $ flipHorizontal img
-              ["flip",_,outFile]
                 → writePng outFile
-                   $ flip img
+                    $ T.flipVertical img
+              ["flipHorizontal",_,outFile]
+                → writePng outFile
+                    $ T.flipHorizontal img
+              -- ["flip",_,outFile]
+                -- → writePng outFile
+                   -- $ T.flip img
               ["blur",_,outFile]
                 → writePng outFile
-                   $ blur img
+                    $ T.blur img
               _ → putStrLn "Please enter valid arguments."
           ImageRGB8 img →
             case args of
               ["flip",_,outFile]
                 → writePng outFile
-                   $ flip img
+                   $ T.flip img
               ["flipHorizontal",_,outFile]
                 → writePng outFile
-                   $ flipHorizontal img
+                   $ T.flipHorizontal img
               ["flipVertical",_,outFile]
                 → writePng outFile
-                   $ flipVertical img
+                   $ T.flipVertical img
               _ → putStrLn "Please enter valid arguments."
           ImageY8 _ → putStrLn "Type not handled yet."
           ImageY16 _ → putStrLn "Type not handled yet."
