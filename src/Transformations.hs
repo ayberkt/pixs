@@ -93,7 +93,31 @@ flipHorizontal img = generateImage complement (imageWidth img) (imageHeight img)
 flip ∷ Pixel a ⇒ Image a → Image a
 flip = flipVertical . flipHorizontal
 
--- TODO: Do not attempt to implement this without
--- being comfortable with pixel algebra
+-- | Take a list of pixels. Return the pixel that is the average color of
+-- those pixels.
+average ∷ [PixelRGBA8] → PixelRGBA8
+average pixs = let avg xs   = sum xs `div` length xs
+                   redAvg ∷ Word8
+                   redAvg   = fromIntegral $ avg [fromIntegral r ∷ Int
+                                                 | (PixelRGBA8 r _ _ _) ← pixs ]
+                   greenAvg ∷ Word8
+                   greenAvg = fromIntegral $ avg [fromIntegral g ∷ Int
+                                                 | (PixelRGBA8 _ g _ _) ← pixs]
+                   blueAvg ∷ Word8
+                   blueAvg = fromIntegral $ avg [fromIntegral b ∷ Int
+                                                | (PixelRGBA8 _ _ b _) ← pixs]
+               in PixelRGBA8 redAvg greenAvg blueAvg 255
+
 blur ∷ Image PixelRGBA8 → Image PixelRGBA8
-blur _ = undefined
+blur img = let black = PixelRGBA8 0 0 0 255
+               neighbors x y
+                 | x <= 0 || y <= 0         = [black]
+                 | x >= imageWidth img - 2  = [black]
+                 | y >= imageHeight img - 2 = [black]
+                 | otherwise = [pixelAt img (x - i) (y - j) | i ← [-1..1], j ← [-1..1]]
+               blurPixel x y
+                 | x <= 0 || y <= 0         = black
+                 | x >= imageWidth img - 2  = black
+                 | y >= imageHeight img - 2 = black
+                 | otherwise = average (neighbors x y)
+           in generateImage blurPixel (imageWidth img) (imageHeight img)
