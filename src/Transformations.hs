@@ -108,13 +108,14 @@ average pixs = let avg xs   = sum xs `div` length xs
                                                 | (PixelRGBA8 _ _ b _) ← pixs]
                in PixelRGBA8 redAvg greenAvg blueAvg 255
 
+-- TODO: There are problems with this; fix them.
 blur ∷  Image PixelRGBA8 → Int → Image PixelRGBA8
 blur img n = let neighbors x y
                    | x <= n || y <= n             = [pixelAt img x y]
                    | xOutOfBounds && yOutOfBounds = [ pixelAt img x y
-                                                   , pixelAt img (x - 1) y
-                                                   , pixelAt img x (y - 1)
-                                                   , pixelAt img (x - 1) (y - 1)]
+                                                    , pixelAt img (x - 1) y
+                                                    , pixelAt img x (y - 1)
+                                                    , pixelAt img (x - 1) (y - 1)]
                    | xOutOfBounds = [pixelAt img x y]
                    | yOutOfBounds = [pixelAt img x y]
                    | otherwise    = [pixelAt img (x - i) (y - j)
