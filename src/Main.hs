@@ -37,7 +37,7 @@ main = do
                    -- $ T.flip img
               ["blur",_,outFile]
                 → writePng outFile
-                    $ T.blur img
+                    $ T.blur img 5
               _ → putStrLn "Please enter valid arguments."
           ImageRGB8 img →
             case args of
