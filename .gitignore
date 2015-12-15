@@ -6,3 +6,4 @@ dist/
 Setup.hs
 pixs
 test.sh
+.stack-work
