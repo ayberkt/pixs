@@ -56,11 +56,16 @@ instance Num PixelRGBA8 where
 
 -- | Flow-checked addition operation which we denote with ⊕.
 (⊕) ∷ Word8 → Int → Word8
-(⊕) x y = fromIntegral . max 0 . min 255 $ (fromIntegral x) + (fromIntegral y)
+(⊕) x y = let x' = (fromIntegral x) ∷ Int
+              y' = (fromIntegral y) ∷ Int
+          in fromIntegral . max 0 . min 255 $ x' + y'
 
 -- | Flow-checked multiplication operation.
 (⊗) ∷ Word8 → Int → Word8
-(⊗) x y = fromIntegral . max 0 . min 255 $ (fromIntegral x) * (fromIntegral y)
+(⊗) x y = let x' = (fromIntegral x) ∷ Int
+              y' = (fromIntegral y) ∷ Int
+          in fromIntegral . max 0 . min 255 $ x' * y'
+
 
 -- | Scalar multiplication.
 scale ∷ Int → PixelRGBA8 → PixelRGBA8
