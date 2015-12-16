@@ -19,7 +19,7 @@ executable pixs
   main-is:             Main.hs
   other-modules:       Transformations
   -- other-extensions:
-  ghc-options:         -Wall -W
+  ghc-options:         -Wall -W -fno-warn-orphans
   build-depends:       base <= 4.9
                      , JuicyPixels >= 3.2
                      , diagrams
