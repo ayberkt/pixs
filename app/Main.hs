@@ -3,7 +3,7 @@
 import Prelude hiding (flip, error)
 import System.Environment (getArgs)
 import Codec.Picture (readImage, writePng, DynamicImage(..))
-import qualified Transformations as T
+import qualified Pixs.Transformation as T
 
 main ∷ IO ()
 main = do
