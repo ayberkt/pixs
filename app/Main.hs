@@ -32,12 +32,15 @@ main = do
               ["flipHorizontal",_,outFile]
                 → writePng outFile
                     $ T.flipHorizontal img
-              -- ["flip",_,outFile]
-                -- → writePng outFile
-                   -- $ T.flip img
+              ["flip",_,outFile]
+                → writePng outFile
+                   $ T.flip img
               ["blur",_,outFile]
                 → writePng outFile
                     $ T.blur img 5
+              ["saturation",_,amount,outFile]
+                → writePng outFile
+                    $ T.saturation (read amount) img
               _ → putStrLn "Please enter valid arguments."
           ImageRGB8 img →
             case args of
