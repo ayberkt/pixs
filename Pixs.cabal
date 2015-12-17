@@ -49,4 +49,4 @@ test-suite spec
 
 source-repository head
   type: git
-  location: https://github.com/ayberkt/pixs
+  location: https://github.com/ayberkt/Pixs
