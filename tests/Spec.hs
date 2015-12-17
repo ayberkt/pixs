@@ -1,7 +1,7 @@
-{-# LANGUAGE  FlexibleInstances #-}
+{-# LANGUAGE  FlexibleInstances         #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE UnicodeSyntax              #-}
 
 module Main where
 
@@ -11,7 +11,7 @@ import Data.Word (Word8)
 import Codec.Picture ( PixelRGBA8(..)
                      , Image(..)
                      , pixelAt)
-import qualified Transformations as T
+import qualified Pixs.Transformation as T
 import qualified Data.Vector.Storable as VS
 import Control.Monad (replicateM)
 
