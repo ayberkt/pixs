@@ -126,3 +126,11 @@ main = hspec $ do
       prop_red_correct
     it "Gives ID when applied twice with x and -x" $ property $
       prop_change_red_ID
+  describe "Negation" $ do
+    let prop_double_neg_ID ∷ Image PixelRGBA8 → Bool
+        prop_double_neg_ID img = if imageWidth img >= 0 && imageHeight img >= 0
+                                 then let img' = T.negateImage . T.negateImage $ img
+                                      in img' == img
+                                 else True
+    it "gives ID when applied twice." $ property $
+      prop_double_neg_ID

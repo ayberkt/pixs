@@ -30,7 +30,6 @@ executable pixs-exe
   build-depends:       base <= 4.9
                      , Pixs >= 0.1.0.0
                      , JuicyPixels >= 3.2
-                     , diagrams
   hs-source-dirs:      app
   default-language:    Haskell2010
 

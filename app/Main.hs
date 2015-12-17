@@ -41,6 +41,9 @@ main = do
               ["saturation",_,amount,outFile]
                 → writePng outFile
                     $ T.saturation (read amount) img
+              ["negate",_,outFile]
+                → writePng outFile
+                    $ T.negateImage img
               _ → putStrLn "Please enter valid arguments."
           ImageRGB8 img →
             case args of
