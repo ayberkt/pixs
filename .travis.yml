@@ -19,7 +19,4 @@ before_install:
 
 install:
   - stack +RTS -N2 -RTS setup
-  - stack +RTS -N2 -RTS build --only-snapshot
-
-script:
-  - stack +RTS -N2 -RTS build --test --haddock
+  - stack test
