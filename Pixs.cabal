@@ -42,6 +42,7 @@ test-suite spec
                       , src
   ghc-options:          -Wall -fno-warn-orphans -j
   build-depends:        base <= 4.9
+                      , Pixs >= 0.1.0.0
                       , hspec
                       , QuickCheck
                       , JuicyPixels >= 3.2
@@ -49,4 +50,4 @@ test-suite spec
 
 source-repository head
   type: git
-  location: https://github.com/ayberkt/Pixs
+  location: https://github.com/ayberkt/pixs
