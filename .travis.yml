@@ -19,4 +19,6 @@ before_install:
 
 install:
   - stack +RTS -N2 -RTS setup
+
+script:
   - stack test
