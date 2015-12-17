@@ -89,7 +89,7 @@ changeGreen amount = pixelMap changeGreen'
 
 changeBlue ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBlue amount = pixelMap changeBlue'
-  where changeBlue' (PixelRGBA8 r g b a) = PixelRGBA8 r g b a
+  where changeBlue' (PixelRGBA8 r g b a) = PixelRGBA8 r g b' a
                                             where b' = b ⊕ amount
 
 saturation ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
