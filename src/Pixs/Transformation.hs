@@ -124,14 +124,16 @@ average pixs = let avg xs   = sum xs `div` length xs
 -- TODO: There are problems with this; fix them.
 blur ∷  Image PixelRGBA8 → Int → Image PixelRGBA8
 blur img n = let neighbors x y
-                   | x <= n || y <= n             = [pixelAt img x y]
-                   | xOutOfBounds && yOutOfBounds = [ pixelAt img x y
-                                                    , pixelAt img (x - 1) y
-                                                    , pixelAt img x (y - 1)
-                                                    , pixelAt img (x - 1)
-                                                                  (y - 1)]
-                   | xOutOfBounds = [pixelAt img x y]
-                   | yOutOfBounds = [pixelAt img x y]
+                   | x <= n || y <= n             = [pixelAt img x y] -- TODO
+                   | xOutOfBounds && yOutOfBounds = [pixelAt img (x - i) (y - j)
+                                                    | i ← [1..n]
+                                                    , j ← [1..n]]
+                   | xOutOfBounds = [pixelAt img (x - i) (y - j)
+                                    | i ← [1..n]
+                                    , j ← [(-n)..n]]
+                   | yOutOfBounds = [pixelAt img (x - i) (y - j)
+                                    | i ← [(-n)..n]
+                                    , j ← [1..n]]
                    | otherwise    = [pixelAt img (x - i) (y - j)
                                     | i ← [(-n)..n], j ← [(-n)..n]]
                    where xOutOfBounds = x >= imageWidth  img - n

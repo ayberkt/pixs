@@ -37,7 +37,7 @@ main = do
                    $ T.flip img
               ["blur",_,outFile]
                 → writePng outFile
-                    $ T.blur img 5
+                    $ T.blur img 10
               ["saturation",_,amount,outFile]
                 → writePng outFile
                     $ T.saturation (read amount) img
