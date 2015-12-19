@@ -145,9 +145,9 @@ getPixel img x y = let xInBounds = x < imageWidth  img && x >= 0
                       then Just $ pixelAt img x y
                       else Nothing
 
+-- TODO: This is a naive implementation---optimize this.
 -- | For every pixel p in an image, assign the average of p's
 -- neighborhood at distance n, to p.
--- TODO: Check if this is working correctly.
 blur ∷  Image PixelRGBA8 → Int → Image PixelRGBA8
 blur img n = let neighbors x y = catMaybes [getPixel img (x - i) (y - j)
                                            | i ← [(-n)..n]
@@ -156,6 +156,6 @@ blur img n = let neighbors x y = catMaybes [getPixel img (x - i) (y - j)
                  h = imageHeight img
              in generateImage (\x y → average (neighbors x y)) w h
 
--- | Negate every pixel.
+-- | Negate the color of a given image.
 negateImage ∷ Image PixelRGBA8 → Image PixelRGBA8
 negateImage img = pixelMap negate img
