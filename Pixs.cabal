@@ -18,6 +18,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Pixs
                      , Pixs.Transformation
+                     , Pixs.Filter
   build-depends:       base <= 4.9
                      , JuicyPixels >= 3.2
   ghc-options:         -Wall -W -fno-warn-orphans -j
