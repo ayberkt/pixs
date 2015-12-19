@@ -11,6 +11,8 @@ module Pixs.Transformation ( blur
                            , changeBrightness
                            , negateImage
                            , saturation
+                           , getPixel
+                           , average
                            , (⊕)
                            , (⊗)) where
 
