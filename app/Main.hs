@@ -5,6 +5,7 @@ import System.Environment (getArgs)
 import Codec.Picture (readImage, writePng, DynamicImage(..))
 import qualified Pixs.Transformation as T
 import qualified Pixs.Filter as F
+import qualified Pixs.Information.Histogram as H
 
 main ∷ IO ()
 main = do
@@ -51,6 +52,8 @@ main = do
               ["--pixelate",_,outFile]
                 → writePng outFile
                     $ F.pixelate img
+              ["redCount",_]
+                → putStrLn . show $ H.redCount img
               _ → putStrLn "Please enter valid arguments."
           ImageRGB8 img →
             case args of

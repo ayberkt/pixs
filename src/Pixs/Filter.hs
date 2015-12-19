@@ -8,7 +8,7 @@ import Codec.Picture ( PixelRGBA8(..)
                      , pixelAt
                      , generateImage)
 import Data.Word (Word8)
-import Pixs.Transformation (getPixel, average)
+import Pixs.Transformation (average)
 
 blackAndWhite ∷ Image PixelRGBA8 → Image PixelRGBA8
 blackAndWhite = let decolor (PixelRGBA8 r g b a)
