@@ -5,7 +5,7 @@ module Pixs.Transformation where
 
 
 import Data.Word
-import Data.Maybe (isJust, fromJust)
+import Data.Maybe (catMaybes)
 import Codec.Picture( PixelRGBA8(..)
                     , Image(..)
                     , Pixel
@@ -135,9 +135,9 @@ getPixel img x y = let xInBounds = x < imageWidth  img && x >= 0
 -- neighborhood at distance n, to p.
 -- TODO: Check if this is working correctly.
 blur ∷  Image PixelRGBA8 → Int → Image PixelRGBA8
-blur img n = let neighbors x y = map fromJust $ filter isJust [getPixel img (x - i) (y - j)
-                                                              | i ← [(-n)..n]
-                                                              , j ← [(-n)..n]]
+blur img n = let neighbors x y = catMaybes [getPixel img (x - i) (y - j)
+                                           | i ← [(-n)..n]
+                                           , j ← [(-n)..n]]
                  w = imageWidth  img
                  h = imageHeight img
              in generateImage (\x y → average (neighbors x y)) w h
