@@ -42,7 +42,7 @@ applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
         g  = fromIntegral . max 0 . min 255 $ g'   ∷ Word8
         b  = fromIntegral . max 0 . min 255 $ b'   ∷ Word8
 
--- | TODO: PixelRGBA8 should not really have an instance of
+--   TODO: PixelRGBA8 should not really have an instance of
 --   Num since it doesn't really behave like a number. For
 --   now we declare a num instance for the convenience of
 --   being able to use (+), (-) etc... It would be the best
@@ -134,8 +134,8 @@ average pixs = let avg xs   = sum xs `div` length xs
                                                 | (PixelRGBA8 _ _ b _) ← pixs]
                in PixelRGBA8 redAvg greenAvg blueAvg 255
 
--- | Try to access pixel at x y. Giving in out of bounds coordinates gives
--- back Nothing.
+-- | Try to access pixel at x y. Yield nothing if the given coordinates
+-- are out of bounds.
 getPixel ∷ Image PixelRGBA8 → Int → Int → Maybe PixelRGBA8
 getPixel img x y = let xInBounds = x < imageWidth  img && x >= 0
                        yInBounds = y < imageHeight img && y >= 0
