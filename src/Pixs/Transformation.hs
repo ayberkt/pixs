@@ -5,6 +5,7 @@ module Pixs.Transformation where
 
 
 import Data.Word
+import Data.Maybe (isJust, fromJust)
 import Codec.Picture( PixelRGBA8(..)
                     , Image(..)
                     , Pixel
@@ -121,25 +122,25 @@ average pixs = let avg xs   = sum xs `div` length xs
                                                 | (PixelRGBA8 _ _ b _) ← pixs]
                in PixelRGBA8 redAvg greenAvg blueAvg 255
 
--- TODO: There are problems with this; fix them.
+-- | Try to access pixel at x y. Giving in out of bounds coordinates gives
+-- back Nothing.
+getPixel ∷ Image PixelRGBA8 → Int → Int → Maybe PixelRGBA8
+getPixel img x y = let xInBounds = x < imageWidth  img && x >= 0
+                       yInBounds = y < imageHeight img && y >= 0
+                   in if xInBounds && yInBounds
+                      then Just $ pixelAt img x y
+                      else Nothing
+
+-- | For every pixel p in an image, assign the average of p's
+-- neighborhood at distance n, to p.
+-- TODO: Check if this is working correctly.
 blur ∷  Image PixelRGBA8 → Int → Image PixelRGBA8
-blur img n = let neighbors x y
-                   | x <= n || y <= n             = [pixelAt img x y] -- TODO
-                   | xOutOfBounds && yOutOfBounds = [pixelAt img (x - i) (y - j)
-                                                    | i ← [1..n]
-                                                    , j ← [1..n]]
-                   | xOutOfBounds = [pixelAt img (x - i) (y - j)
-                                    | i ← [1..n]
-                                    , j ← [(-n)..n]]
-                   | yOutOfBounds = [pixelAt img (x - i) (y - j)
-                                    | i ← [(-n)..n]
-                                    , j ← [1..n]]
-                   | otherwise    = [pixelAt img (x - i) (y - j)
-                                    | i ← [(-n)..n], j ← [(-n)..n]]
-                   where xOutOfBounds = x >= imageWidth  img - n
-                         yOutOfBounds = y >= imageHeight img - n
-                 blurPixel x y = average (neighbors x y)
-             in generateImage blurPixel (imageWidth img) (imageHeight img)
+blur img n = let neighbors x y = map fromJust $ filter isJust [getPixel img (x - i) (y - j)
+                                                              | i ← [(-n)..n]
+                                                              , j ← [(-n)..n]]
+                 w = imageWidth  img
+                 h = imageHeight img
+             in generateImage (\x y → average (neighbors x y)) w h
 
 -- | Negate every pixel.
 negateImage ∷ Image PixelRGBA8 → Image PixelRGBA8
