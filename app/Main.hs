@@ -1,11 +1,12 @@
 {-# LANGUAGE UnicodeSyntax #-}
 
-import Prelude hiding (flip, error)
-import System.Environment (getArgs)
-import Codec.Picture (readImage, writePng, DynamicImage(..))
-import qualified Pixs.Transformation as T
-import qualified Pixs.Filter as F
+import           Codec.Picture              (DynamicImage (..), readImage,
+                                             writePng)
+import qualified Pixs.Filter                as F
 import qualified Pixs.Information.Histogram as H
+import qualified Pixs.Transformation        as T
+import           Prelude                    hiding (error, flip)
+import           System.Environment         (getArgs)
 
 main ∷ IO ()
 main = do
