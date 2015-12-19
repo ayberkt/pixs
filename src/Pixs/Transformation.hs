@@ -1,9 +1,21 @@
 {-# LANGUAGE FlexibleInstances  #-}
 {-# LANGUAGE UnicodeSyntax      #-}
 
-module Pixs.Transformation where
+module Pixs.Transformation ( blur
+                           , flipVertical
+                           , flipHorizontal
+                           , flip
+                           , changeRed
+                           , changeGreen
+                           , changeBlue
+                           , changeBrightness
+                           , negateImage
+                           , saturation
+                           , (⊕)
+                           , (⊗)) where
 
 
+import Prelude hiding (flip)
 import Data.Word
 import Data.Maybe (catMaybes)
 import Codec.Picture( PixelRGBA8(..)
