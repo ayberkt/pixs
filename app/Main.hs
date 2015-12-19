@@ -48,6 +48,9 @@ main = do
               ["--black-and-white",_,outFile]
                 → writePng outFile
                     $ F.blackAndWhite img
+              ["--pixelate",_,outFile]
+                → writePng outFile
+                    $ F.pixelate img
               _ → putStrLn "Please enter valid arguments."
           ImageRGB8 img →
             case args of
