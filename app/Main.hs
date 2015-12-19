@@ -4,6 +4,7 @@ import Prelude hiding (flip, error)
 import System.Environment (getArgs)
 import Codec.Picture (readImage, writePng, DynamicImage(..))
 import qualified Pixs.Transformation as T
+import qualified Pixs.Filter as F
 
 main ∷ IO ()
 main = do
@@ -35,15 +36,18 @@ main = do
               ["flip",_,outFile]
                 → writePng outFile
                    $ T.flip img
-              ["blur",_,outFile]
+              ["blur",_,amount,outFile]
                 → writePng outFile
-                    $ T.blur img 10
+                    $ T.blur img (read amount)
               ["saturation",_,amount,outFile]
                 → writePng outFile
                     $ T.saturation (read amount) img
               ["negate",_,outFile]
                 → writePng outFile
                     $ T.negateImage img
+              ["--black-and-white",_,outFile]
+                → writePng outFile
+                    $ F.blackAndWhite img
               _ → putStrLn "Please enter valid arguments."
           ImageRGB8 img →
             case args of
