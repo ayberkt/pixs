@@ -18,6 +18,9 @@ data Color = Red
            | Blue
            deriving (Show,Eq,Ord)
 
+-- | Takes in an image `img` and a color `c`. Returns a map that stores
+-- for every given Word8 value v, the total number of pixels that hold a
+-- a `c` component of magnitude v.
 colorCount ∷ Image PixelRGBA8 → Color → Map Word8 Int
 colorCount img c = let count m x y
                          | y == imageHeight img - 1 = m
