@@ -13,24 +13,23 @@ import           Data.Map      ( Map
 import           Data.Word     (Word8)
 import           Prelude       hiding (lookup)
 
-redCount ∷ Image PixelRGBA8 → Map Word8 Int
-redCount img = let count ∷ Map Word8 Int → Int → Int → Map Word8 Int
-                   count m x y
-                     | y == imageHeight img - 1 = m
-                     | x == imageWidth  img - 1 = count m' 0 (succ y)
-                     | otherwise = count m' (succ x) y
-                     where r' = case pixelAt img x y of (PixelRGBA8 r _ _ _) → r
-                           m' = adjust (+ 1) r' m
-                   initMap = fromList $ map (\x → (x, 0)) [0..255]
-               in count initMap 0 0
+data Color = Red
+           | Green
+           | Blue
+           deriving (Show,Eq,Ord)
 
-blueCount ∷ Image PixelRGBA8 → Map Word8 Int
-blueCount img = let count ∷ Map Word8 Int → Int → Int → Map Word8 Int
-                    count m x y
-                      | y == imageHeight img - 1 = m
-                      | x == imageWidth  img - 1 = count m' 0 (succ y)
-                      | otherwise = count m' (succ x) y
-                      where r' = case pixelAt img x y of (PixelRGBA8 _ _ b _) → b
-                            m' = adjust (+ 1) r' m
-                    initMap = fromList $ map (\x → (x, 0)) [0..255]
-                in count initMap 0 0
+colorCount ∷ Image PixelRGBA8 → Color → Map Word8 Int
+colorCount img c = let count m x y
+                         | y == imageHeight img - 1 = m
+                         | x == imageWidth  img - 1 = count m' 0 (succ y)
+                         | otherwise = count m' (succ x) y
+                         where (PixelRGBA8 r g b _) = pixelAt img x y
+                               m' = case c of Red   → adjust (+ 1) r m
+                                              Green → adjust (+ 1) g m
+                                              Blue  → adjust (+ 1) b m
+                       initMap = fromList $ map (\x → (x,0)) [0..255]
+                   in count initMap 0 0
+
+redCount ∷ Image PixelRGBA8 → Map Word8 Int
+redCount img = colorCount img Red
+

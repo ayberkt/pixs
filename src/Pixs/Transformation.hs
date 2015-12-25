@@ -45,7 +45,7 @@ applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
         b  = fromIntegral . max 0 . min 255 $ b'   ∷ Word8
 
 --   TODO: PixelRGBA8 should not really have an instance of
---   Num since it doesn't really behave like a number. For
+--   Num since it doesn't behave like a number. For
 --   now we declare a num instance for the convenience of
 --   being able to use (+), (-) etc... It would be the best
 --   it were a VectorSpace if a VectorSpace typeclass exists
@@ -83,8 +83,8 @@ instance Num PixelRGBA8 where
 
 
 -- | Scalar multiplication.
-scale ∷ Int → PixelRGBA8 → PixelRGBA8
-scale n (PixelRGBA8 r g b a) = PixelRGBA8 (r ⊗ n) (g ⊗ n) (b ⊗ n) a
+-- scale ∷ Int → PixelRGBA8 → PixelRGBA8
+-- scale n (PixelRGBA8 r g b a) = PixelRGBA8 (r ⊗ n) (g ⊗ n) (b ⊗ n) a
 
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
