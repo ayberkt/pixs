@@ -55,6 +55,8 @@ main = do
                     $ F.pixelate img
               ["redCount",_]
                 → putStrLn . show $ H.redCount img
+              ["histogram",_]
+                → H.makeHistogram img
               _ → putStrLn "Please enter valid arguments."
           ImageRGB8 img →
             case args of
