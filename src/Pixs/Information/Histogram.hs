@@ -55,11 +55,9 @@ toDouble (x, y) = (fromIntegral x, y)
 
 -- | Create the histogram and save it to a file.
 makeHistogram ∷ Image PixelRGBA8 → IO ()
-makeHistogram img = let [rCount,_,_] = colorCount img
-                                                   <$> [Red, Green, Blue]
-                        rCount' = toDouble <$> M.toList rCount
+makeHistogram img = let [rCount,_,_] = (map toDouble) . M.toList . (colorCount img) <$> [Red, Green, Blue]
                     in toFile def "example.svg" $ do
                          layout_title .= "Color histogram"
                          layout_title_style . font_size .= 10
                          plot (fill "Red" violet [(d, (0, v))
-                                              | (d, v) ← rCount'])
+                                              | (d, v) ← rCount])
