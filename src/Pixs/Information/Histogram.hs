@@ -15,6 +15,9 @@ import           Graphics.Rendering.Chart.Backend.Diagrams
 import           Graphics.Rendering.Chart.Easy
 import           Prelude                                   hiding (lookup)
 
+(∘) ∷ (β → γ) → (α → β) → (α → γ)
+(∘) = (.)
+
 data Color = Red
            | Green
            | Blue
@@ -52,11 +55,11 @@ fill title color vs = liftEC $ do
 makeHistogram ∷ Image PixelRGBA8 → IO ()
 makeHistogram img = let toDouble ∷ Integral α ⇒ (α,β) → (Double,β)
                         toDouble (x,y) = (fromIntegral x,y)
-                        [rCount,_,_] = colorCount img
-                                                   <$> [Red, Green, Blue]
-                        rCount' = toDouble <$> M.toList rCount
+                        [rCount,gCount,bCount] = (toDouble ∘ M.toList ∘ colorCount img) <$> [Red, Green, Blue]
                     in toFile def "example.svg" $ do
                          layout_title .= "Color histogram"
                          layout_title_style . font_size .= 10
                          plot (fill "Red" violet [(d, (0, v))
-                                              | (d, v) ← rCount'])
+                                              | (d, v) ← rCount])
+                         plot (fill "Red" green [(d, (0, v))
+                                              | (d, v) ← rCount])
