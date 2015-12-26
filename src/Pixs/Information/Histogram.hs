@@ -9,9 +9,12 @@ import           Codec.Picture ( Image
                                , pixelAt)
 import qualified Data.Map.Strict as M
 import           Data.Map.Strict (Map)
+import           Data.Colour
+import           Data.Colour.Names
+import           Data.Colour.SRGB (sRGB)
 import           Data.Word     (Word8)
 import           Graphics.Rendering.Chart.Easy
-import           Graphics.Rendering.Chart.Backend.Cairo
+import           Graphics.Rendering.Chart.Backend.Diagrams
 import           Prelude       hiding (lookup)
 
 data Color = Red
@@ -37,16 +40,7 @@ colorCount img c = let count m x y
 redCount ∷ Image PixelRGBA8 → Map Word8 Int
 redCount img = colorCount img Red
 
-type Pt = (Word8, Int)
-type Points = [Pt]
-
-dataSeries ∷ Image PixelRGBA8 → [(String, Points)]
-dataSeries img =
-  let [rCount, gCount, bCount] = colorCount img <$> [Red, Green, Blue]
-  in [ ("Red",   M.toList rCount)
-     , ("Green", M.toList gCount)
-     , ("Blue",  M.toList bCount)]
-
+fill ∷ String → [(α, (β, β))] → EC θ (PlotFillBetween α β)
 fill title vs = liftEC $ do
   plot_fillbetween_title .= title
   color ← takeColor
@@ -56,9 +50,13 @@ fill title vs = liftEC $ do
 toDouble ∷ Integral α ⇒ (α, β) → (Double, β)
 toDouble (x, y) = (fromIntegral x, y)
 
+-- | Create the histogram and save it to a file.
 makeHistogram ∷ Image PixelRGBA8 → IO ()
 makeHistogram img = let [rCount, gCount, bCount] = colorCount img
                                                    <$> [Red, Green, Blue]
-                    in toFile def "example.png" $ do
-                      layout_title .= "Color histogram"
-                      plot (fill "Red" [(d, (0, v)) | (d, v) ← toDouble <$> (M.toList rCount)])
+                        rCount' = M.toList rCount
+                    in toFile def "example.svg" $ do
+                         layout_title .= "Color histogram"
+                         layout_title_style . font_size .= 10
+                         plot (fill "Red" [(d, (0, v))
+                                          | (d, v) ← toDouble <$> rCount'])
