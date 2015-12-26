@@ -15,9 +15,6 @@ import           Graphics.Rendering.Chart.Backend.Diagrams
 import           Graphics.Rendering.Chart.Easy
 import           Prelude                                   hiding (lookup)
 
-(∘) ∷ (β → γ) → (α → β) → (α → γ)
-(∘) = (.)
-
 data Color = Red
            | Green
            | Blue
@@ -47,7 +44,7 @@ greenCount img = colorCount img Green
 fill ∷ String → Colour Double → [(α, (β, β))] → EC θ (PlotFillBetween α β)
 fill title color vs = liftEC $ do
   plot_fillbetween_title .= title
-  let color' = opaque color
+  let color' = withOpacity color 0.7
   plot_fillbetween_style  .= solidFillStyle color'
   plot_fillbetween_values .= vs
 
@@ -55,9 +52,16 @@ fill title color vs = liftEC $ do
 makeHistogram ∷ Image PixelRGBA8 → IO ()
 makeHistogram img = let toDouble ∷ Integral α ⇒ (α,β) → (Double,β)
                         toDouble (x,y) = (fromIntegral x,y)
-                        [rCount,gCount,bCount] = (map toDouble) . M.toList . (colorCount img) <$> [Red, Green, Blue]
+                        [rCount,gCount,bCount] =   map toDouble
+                                                 . M.toList
+                                                 . colorCount img
+                                                 <$> [Red, Green, Blue]
                     in toFile def "example.svg" $ do
                          layout_title .= "Color histogram"
-                         layout_title_style . font_size .= 10
-                         plot (fill "Red" violet [(d, (0, v))
+                         layout_title_style . font_size .= 15
+                         plot (fill "Red" red [(d, (0, v))
                                               | (d, v) ← rCount])
+                         plot (fill "Green" green [(d, (0, v))
+                                                  | (d, v) ← gCount])
+                         plot (fill "Blue" blue [(d, (0, v))
+                                                  | (d, v) ← bCount])
