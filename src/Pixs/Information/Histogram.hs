@@ -2,20 +2,21 @@
 
 module Pixs.Information.Histogram where
 
-import           Codec.Picture ( Image
-                               , PixelRGBA8(..)
-                               , imageHeight
-                               , imageWidth
-                               , pixelAt)
-import qualified Data.Map.Strict as M
-import           Data.Map.Strict (Map)
+import           Codec.Picture                             (Image,
+                                                            PixelRGBA8 (..),
+                                                            imageHeight,
+                                                            imageWidth, pixelAt)
 import           Data.Colour
 import           Data.Colour.Names
-import           Data.Colour.SRGB (sRGB)
-import           Data.Word     (Word8)
-import           Graphics.Rendering.Chart.Easy
+import           Data.Map.Strict                           (Map)
+import qualified Data.Map.Strict                           as M
+import           Data.Word                                 (Word8)
 import           Graphics.Rendering.Chart.Backend.Diagrams
-import           Prelude       hiding (lookup)
+import           Graphics.Rendering.Chart.Easy
+import           Prelude                                   hiding (lookup)
+
+(∘) ∷ (β → γ) → (α → β) → (α → γ)
+(∘) = (.)
 
 data Color = Red
            | Green
@@ -50,12 +51,11 @@ fill title color vs = liftEC $ do
   plot_fillbetween_style  .= solidFillStyle color'
   plot_fillbetween_values .= vs
 
-toDouble ∷ Integral α ⇒ (α, β) → (Double, β)
-toDouble (x, y) = (fromIntegral x, y)
-
 -- | Create the histogram and save it to a file.
 makeHistogram ∷ Image PixelRGBA8 → IO ()
-makeHistogram img = let [rCount,_,_] = (map toDouble) . M.toList . (colorCount img) <$> [Red, Green, Blue]
+makeHistogram img = let toDouble ∷ Integral α ⇒ (α,β) → (Double,β)
+                        toDouble (x,y) = (fromIntegral x,y)
+                        [rCount,gCount,bCount] = (map toDouble) . M.toList . (colorCount img) <$> [Red, Green, Blue]
                     in toFile def "example.svg" $ do
                          layout_title .= "Color histogram"
                          layout_title_style . font_size .= 10
