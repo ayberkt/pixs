@@ -22,7 +22,7 @@ data Color = Red
            | Blue
            deriving (Show,Eq,Ord)
 
--- | Takes in an image `img` and a color `c`. Returns a map that stores
+-- | Takes in an image `img` and a @Color@ `c`. Returns a map that stores
 -- for every given Word8 value v, the total number of pixels that hold a
 -- a `c` component of magnitude v.
 colorCount ∷ Image PixelRGBA8 → Color → M.Map Word8 Int
@@ -43,7 +43,7 @@ redCount img = colorCount img Red
 fill ∷ String → [(α, (β, β))] → EC θ (PlotFillBetween α β)
 fill title vs = liftEC $ do
   plot_fillbetween_title .= title
-  color ← takeColor
+  let color = opaque red
   plot_fillbetween_style  .= solidFillStyle color
   plot_fillbetween_values .= vs
 
@@ -52,11 +52,11 @@ toDouble (x, y) = (fromIntegral x, y)
 
 -- | Create the histogram and save it to a file.
 makeHistogram ∷ Image PixelRGBA8 → IO ()
-makeHistogram img = let [rCount, gCount, bCount] = colorCount img
+makeHistogram img = let [rCount,_,_] = colorCount img
                                                    <$> [Red, Green, Blue]
-                        rCount' = M.toList rCount
+                        rCount' = toDouble <$> M.toList rCount
                     in toFile def "example.svg" $ do
                          layout_title .= "Color histogram"
                          layout_title_style . font_size .= 10
                          plot (fill "Red" [(d, (0, v))
-                                          | (d, v) ← toDouble <$> rCount'])
+                                          | (d, v) ← rCount'])
