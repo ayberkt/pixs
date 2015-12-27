@@ -41,9 +41,9 @@ redCount img = colorCount img Red
 greenCount ∷ Image PixelRGBA8 → Map Word8 Int
 greenCount img = colorCount img Green
 
-fill ∷ String → Colour Double → [(α, (β, β))] → EC θ (PlotFillBetween α β)
-fill title color vs = liftEC $ do
-  plot_fillbetween_title .= title
+fill ∷ Colour Double → [(α, (β, β))] → EC θ (PlotFillBetween α β)
+fill color vs = liftEC $ do
+  -- plot_fillbetween_title .= title
   let color' = withOpacity color 0.7
   plot_fillbetween_style  .= solidFillStyle color'
   plot_fillbetween_values .= vs
@@ -59,9 +59,9 @@ makeHistogram img = let toDouble ∷ Integral α ⇒ (α,β) → (Double,β)
                     in toFile def "example.svg" $ do
                          layout_title .= "Color histogram"
                          layout_title_style . font_size .= 15
-                         plot (fill "Red" red [(d, (0, v))
-                                              | (d, v) ← rCount])
-                         plot (fill "Green" green [(d, (0, v))
-                                                  | (d, v) ← gCount])
-                         plot (fill "Blue" blue [(d, (0, v))
-                                                  | (d, v) ← bCount])
+                         plot (fill red   [(d, (0, v))
+                                          | (d, v) ← rCount])
+                         plot (fill green [(d, (0, v))
+                                          | (d, v) ← gCount])
+                         plot (fill blue  [(d, (0, v))
+                                          | (d, v) ← bCount])
