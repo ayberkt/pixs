@@ -17,8 +17,8 @@ command-line interface to `Pixs`.
   - [ ] Invert/Logical NOT
   - [ ] Bitshift operators
 - Color adjustments
-  - [ ] Brightess
-  - [ ] Colors
+  - [x] Brightness
+  - [x] Colors
   - [ ] Contrast
 - Geometric Operations
   - [ ] Scale
