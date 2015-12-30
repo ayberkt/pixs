@@ -14,7 +14,9 @@ module Pixs.Transformation ( blur
                            , getPixel
                            , average
                            , (⊕)
-                           , (⊗)) where
+                           , safeAdd
+                           , (⊗)
+                           , safeMultiply) where
 
 
 import Prelude hiding (flip)
@@ -75,12 +77,19 @@ instance Num PixelRGBA8 where
               y' = (fromIntegral y) ∷ Int
           in fromIntegral . max 0 . min 255 $ x' + y'
 
+-- | ASCII alias for flow-checked addition
+safeAdd ∷ Word8 → Int → Word8
+safeAdd = (⊕)
+
 -- | Flow-checked multiplication operation.
 (⊗) ∷ Word8 → Int → Word8
 (⊗) x y = let x' = (fromIntegral x) ∷ Int
               y' = (fromIntegral y) ∷ Int
           in fromIntegral . max 0 . min 255 $ x' * y'
 
+-- | ASCII alias for flow-checked multiplication.
+safeMultiply ∷ Word8 → Int → Word8
+safeMultiply = (⊗)
 
 -- | Scalar multiplication.
 -- scale ∷ Int → PixelRGBA8 → PixelRGBA8
