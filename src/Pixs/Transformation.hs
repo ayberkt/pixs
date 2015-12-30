@@ -72,22 +72,22 @@ instance Num PixelRGBA8 where
   fromInteger _ = undefined
 
 -- | Flow-checked addition operation which we denote with ⊕.
+-- Also has an ASCII alias `safeAdd`.
 (⊕) ∷ Word8 → Int → Word8
 (⊕) x y = let x' = (fromIntegral x) ∷ Int
               y' = (fromIntegral y) ∷ Int
           in fromIntegral . max 0 . min 255 $ x' + y'
 
--- | ASCII alias for flow-checked addition
 safeAdd ∷ Word8 → Int → Word8
 safeAdd = (⊕)
 
 -- | Flow-checked multiplication operation.
+-- Also has an ASCII alias `safeMultiply`.
 (⊗) ∷ Word8 → Int → Word8
 (⊗) x y = let x' = (fromIntegral x) ∷ Int
               y' = (fromIntegral y) ∷ Int
           in fromIntegral . max 0 . min 255 $ x' * y'
 
--- | ASCII alias for flow-checked multiplication.
 safeMultiply ∷ Word8 → Int → Word8
 safeMultiply = (⊗)
 

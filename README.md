@@ -6,12 +6,12 @@ command-line interface to `Pixs`.
 ## TODO
 
 - Image Arithmetic
-  - [ ] Addition
-  - [ ] Subtraction
-  - [ ] Multiplication
+  - [x] Addition
+  - [x] Subtraction
+  - [x] Multiplication
   - [ ] Division
   - [ ] Blending
-  - [ ] Logical AND/NAND
+  - [x] Logical AND/NAND
   - [ ] Logical OR/NOR
   - [ ] Logical XOR/XNOR
   - [ ] Invert/Logical NOT
