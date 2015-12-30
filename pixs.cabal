@@ -17,6 +17,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Pixs
+                     , Pixs.Arithmetic
                      , Pixs.Transformation
                      , Pixs.Filter
                      , Pixs.Information.Histogram
