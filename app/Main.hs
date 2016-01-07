@@ -7,6 +7,7 @@ import qualified Pixs.Information.Histogram as H
 import qualified Pixs.Transformation        as T
 import           Prelude                    hiding (error, flip)
 import           System.Environment         (getArgs)
+import           Options.Applicative
 
 main ∷ IO ()
 main = do
