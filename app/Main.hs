@@ -10,55 +10,72 @@ import           System.Environment         (getArgs)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
-data Command = ChangeBrightness
-             | ChangeRed
-             | ChangeGreen
-             | ChangeBlue
-             | FlipVertical
-             | FlipHorizontal
-             | Flip
+data Command = Brightness String Int    String
+             | Flip       String String
+             deriving (Eq, Read)
 
-data PixsArgs = PixsArgs { cmd       ∷ Command
-                         , imagePath ∷ String
-                         , amount    ∷ Int
-                         , outPath   ∷ String
-                         }
+data Options = Options { inputFile  ∷ String
+                       , outputFile ∷ String
+                       }
 
-brightness ∷ Parser PixsArgs
-brightness = PixsArgs
-          <$> fmap (\x → (read x) ∷ Command) A.option
-              (   A.long "in"
-               <> A.metavar "COMMAND")
-          <*> A.strOption
-              (   A.long "in"
-               <> A.metavar "INPUT"
-               <> A.help "Input image file to be transformed.")
-          <*> fmap (\x → (read x) :: Int) -- Read the string and type it
-                                          -- as an `Int`.
-                   (A.strOption
-                    (   A.long "amount"
-                     <> A.metavar "MAGNITUDE"
-                     <> A.help "Magnitude of brightness change."))
-          <*> A.strOption
-              (   A.long "out"
-               <> A.metavar "OUTPUT FILE"
-               <> A.help "File name to write to.")
+brightness ∷ Parser Command
+brightness = let toInt x = (read x) ∷ Int
+             in Brightness
+                <$> A.strOption (   A.long "in"
+                                 <> A.metavar "INPUT"
+                                 <> A.help "Input image file to be transformed")
+                <*> fmap toInt
+                      (A.strOption
+                        (   A.long "magnitude"
+                         <> A.short 'm'
+                         <> A.metavar "MAGNITUDE"
+                         <> A.help "Magnitude of brightness change"))
+                <*> A.strOption
+                      (   A.long "out"
+                       <> A.metavar "OUTPUT"
+                       <> A.help "File name to write to.")
 
-menu ∷ Brightness → IO ()
-menu (Brightness inFile n outFile) = do
+flip ∷ Parser Command
+flip = Flip
+    <$> A.strOption (  A.long "in"
+                    <> A.metavar "INPUT"
+                    <> A.help "Input image file to be transformed.")
+    <*> A.strOption
+    (   A.long "out"
+     <> A.metavar "OUTPUT"
+     <> A.help "File name to write to.")
+
+menu ∷ Parser Command
+menu = A.subparser
+         $  A.command "brightness"
+             (A.info brightness
+                      (A.progDesc "Change brightness of given image."))
+         <> A.command "flip"
+             (A.info flip
+                      (A.progDesc "Flip a given image about the origin."))
+
+run ∷ Command → IO ()
+run (Brightness inFile n outFile) = do
   imageLoad ← readImage inFile
   case imageLoad of
-    Left  error  → putStrLn error
-    Right image  → case image of
+    Left error  → putStrLn error
+    Right image → case image of
       ImageRGBA8 img → writePng outFile
-                       $ T.changeBrightness n img
+                         $ T.changeBrightness n img
+run (Flip inFile outFile) = do
+  imageLoad ← readImage inFile
+  case imageLoad of
+    Left  error → putStrLn error
+    Right image → case image of
+      ImageRGBA8 img → writePng outFile
+                         $ T.flip img
 
 main ∷ IO ()
-main = let opts = A.info (A.helper <*> brightness)
+main = let opts = A.info (A.helper <*> menu)
                   (   A.fullDesc
                    <> A.progDesc "Process images."
                    <> A.header "pixs")
-       in A.execParser opts >>= menu
+       in A.execParser opts >>= run
 
 -- main ∷ IO ()
 -- main = do
