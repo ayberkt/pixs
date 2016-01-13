@@ -14,10 +14,6 @@ data Command = Brightness String Int    String
              | Flip       String String
              deriving (Eq, Read)
 
-data Options = Options { inputFile  ∷ String
-                       , outputFile ∷ String
-                       }
-
 brightness ∷ Parser Command
 brightness = let toInt x = (read x) ∷ Int
              in Brightness
