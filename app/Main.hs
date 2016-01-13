@@ -7,7 +7,20 @@ import qualified Pixs.Information.Histogram as H
 import qualified Pixs.Transformation        as T
 import           Prelude                    hiding (error, flip)
 import           System.Environment         (getArgs)
-import           Options.Applicative
+import qualified Options.Applicative        as A
+import           Options.Applicative        (Parser, (<>))
+
+data Brightness = Brightness { amount ∷ Int }
+
+brightness ∷ Parser Brightness
+brightness = Brightness
+          <$> option
+              (   A.long "hello"
+               <> A.metavar "TARGET"
+               <> A.help "Target for the greeting")
+          <*> A.switch
+              (A.long "quiet"
+               <> A.help "whether to be quiet")
 
 main ∷ IO ()
 main = do
