@@ -13,6 +13,7 @@ import Codec.Picture ( PixelRGBA8(..)
                      , pixelAt)
 import qualified Pixs.Transformation as T
 import qualified Data.Vector.Storable as VS
+import qualified Pixs.Arithmetic as A
 import Control.Monad (replicateM)
 
 instance Arbitrary (Image PixelRGBA8) where
@@ -85,6 +86,15 @@ prop_red_correct a (Positive x) (Positive y) img
          in r' == (r T.⊕ x)
     else True
 
+prop_image_add_assoc ∷ Image PixelRGBA8 → Image PixelRGBA8 → Bool
+prop_image_add_assoc img₁ img₂ = if cond1 && cond2 && cond3 && cond4
+                                then (A.add img₁ img₂) == (A.add img₂ img₁)
+                                else True
+  where cond1 = (imageWidth img₁) >= 0
+        cond2 = (imageHeight img₁) >= 0
+        cond3 = (imageWidth img₂) >= 0
+        cond4 = (imageHeight img₂) >= 0
+
 main ∷ IO ()
 main = hspec $ do
   describe "Image equality" $ do
@@ -121,6 +131,9 @@ main = hspec $ do
     it "handles normal case" $
       let p = PixelRGBA8 250 250 250 250
       in negate p `shouldBe` PixelRGBA8 5 5 5 255
+  describe "Image addition" $
+    it "is associative" $ property
+      prop_image_add_assoc
   describe "Red adjustment" $ do
     it "is correct" $ property $
       prop_red_correct

@@ -20,7 +20,7 @@ command-line interface to `Pixs`.
   - [ ] Thresholding
   - [ ] Adaptive thresholding
   - [ ] Contrast stretching
-  - [ ] Histogram equalization
+  - [ ] Histogram equalzation
   - [ ] Logarithm operator
   - [ ] Exponentiation operator
 - Color adjustments
