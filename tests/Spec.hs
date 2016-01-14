@@ -138,6 +138,8 @@ main = hspec $ do
       prop_pixel_comm (+)
     it "is associative" $ property $
       prop_pixel_assoc (+)
+    it "is distributive" $ property $
+      prop_pixel_dist (+)
     it "correctly adds two arbitrary pixels" $
       let p₁ = PixelRGBA8 21 21 21 21
           p₂ = PixelRGBA8 30 30 30 30
