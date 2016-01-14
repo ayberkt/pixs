@@ -130,6 +130,7 @@ menu = A.subparser
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img
+unwrapImage (ImageRGB8 img)  = Just (T.addAlphaChannel img)
 unwrapImage _                = Nothing
 
 run ∷ CommandType → IO ()

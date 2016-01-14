@@ -8,6 +8,7 @@ module Pixs.Transformation ( blur
                            , changeRed
                            , changeGreen
                            , changeBlue
+                           , addAlphaChannel
                            , changeBrightness
                            , negateImage
                            , saturation
@@ -26,6 +27,7 @@ import Control.Arrow ((***))
 import Data.Word
 import Data.Maybe (catMaybes)
 import Codec.Picture( PixelRGBA8(..)
+                    , PixelRGB8(..)
                     , Image(..)
                     , Pixel
                     , pixelMap
@@ -100,6 +102,10 @@ scale ∷ Double → PixelRGBA8 → PixelRGBA8
 scale n (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
   where
     [r', g', b'] = map (round . limit . (* n) . fromIntegral) [r, g, b]
+
+addAlphaChannel ∷ Image PixelRGB8 → Image PixelRGBA8
+addAlphaChannel = pixelMap addAlphaChannel'
+    where addAlphaChannel' (PixelRGB8 r g b) = PixelRGBA8 r g b 0xFF
 
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
