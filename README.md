@@ -16,6 +16,13 @@ command-line interface to `Pixs`.
   - [ ] Logical XOR/XNOR
   - [ ] Invert/Logical NOT
   - [ ] Bitshift operators
+- Point operations
+  - [ ] Thresholding
+  - [ ] Adaptive thresholding
+  - [ ] Contrast stretching
+  - [ ] Histogram equalization
+  - [ ] Logarithm operator
+  - [ ] Exponentiation operator
 - Color adjustments
   - [x] Brightness
   - [x] Colors
@@ -32,4 +39,6 @@ command-line interface to `Pixs`.
 - Filters
   - [x] Mean blur
   - [ ] Gaussian blur
+  - [ ] Frequency filters
+  - [ ] Laplacian/Laplacian of gaussian filter
   - [x] Pixelation
