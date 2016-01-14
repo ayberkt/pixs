@@ -1,4 +1,4 @@
-{-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE UnicodeSyntax, ViewPatterns #-}
 
 import           Data.Either                (partitionEithers)
 import           Codec.Picture              (DynamicImage (..), Image,
@@ -11,13 +11,10 @@ import           Prelude                    hiding (error, flip)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
-data Command = Brightness FilePath   Int      FilePath
-             | Red        FilePath   Int      FilePath
-             | Green      FilePath   Int      FilePath
-             | Blue       FilePath   Int      FilePath
-             | Flip       FilePath   FilePath
-             | Add        [FilePath] FilePath
-             deriving (Eq, Read)
+data CommandType =
+    SingleT FilePath   FilePath          (Image PixelRGBA8 → Image PixelRGBA8)
+  | MultiT  [FilePath] FilePath          ([Image PixelRGBA8] → Image PixelRGBA8)
+  | ArgT    FilePath   Int      FilePath (Int → Image PixelRGBA8 → Image PixelRGBA8)
 
 inputOption ∷ Parser FilePath
 inputOption = A.strOption (   A.long "in"
@@ -36,8 +33,8 @@ magnitudeOption = (A.option A.auto
                     <> A.metavar "MAGNITUDE"
                     <> A.help "Magnitude of change"))
 
-brightness ∷ Parser Command
-brightness = Brightness
+brightness ∷ Parser CommandType
+brightness = ArgT
     <$> inputOption
     <*> (A.option A.auto
            (   A.long "magnitude"
@@ -45,37 +42,42 @@ brightness = Brightness
             <> A.metavar "MAGNITUDE"
             <> A.help "Magnitude of brightness change"))
     <*> outputOption
+    <*> pure T.changeBrightness
 
-red ∷ Parser Command
-red =  Red
+red ∷ Parser CommandType
+red =  ArgT
    <$> inputOption
    <*> magnitudeOption
    <*> outputOption
+   <*> pure T.changeRed
 
-green ∷ Parser Command
-green =  Green
+green ∷ Parser CommandType
+green =  ArgT
      <$> inputOption
      <*> magnitudeOption
      <*> outputOption
+     <*> pure T.changeGreen
 
-blue ∷ Parser Command
-blue =  Blue
+blue ∷ Parser CommandType
+blue =  ArgT
     <$> inputOption
     <*> magnitudeOption
     <*> outputOption
+    <*> pure T.changeBlue
 
-flip ∷ Parser Command
-flip = Flip <$> inputOption <*> outputOption
+flip ∷ Parser CommandType
+flip = SingleT <$> inputOption <*> outputOption <*> pure T.flip
 
-add ∷ Parser Command
-add = Add
+add ∷ Parser CommandType
+add = MultiT
     <$> (A.many $ A.strOption
            (   A.long "img"
             <> A.metavar "IMAGE"
             <> A.help "Image to be added"))
     <*> outputOption
+    <*> pure (foldl1 Arith.add)
 
-menu ∷ Parser Command
+menu ∷ Parser CommandType
 menu = A.subparser
          $  A.command "brightness"
              (A.info brightness
@@ -100,54 +102,28 @@ unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img
 unwrapImage _                = Nothing
 
-run ∷ Command → IO ()
-run (Brightness inFile n outFile) = do
-  imageLoad ← readImage inFile
-  case imageLoad of
-    Left error  → putStrLn error
-    Right image → case image of
-      ImageRGBA8 img → writePng outFile
-                         $ T.changeBrightness n img
-      _              → putStrLn "Type not handled yet."
-run (Flip inFile outFile) = do
+run ∷ CommandType → IO ()
+run (SingleT inFile outFile f) = do
   imageLoad ← readImage inFile
   case imageLoad of
     Left  error → putStrLn error
     Right image → case image of
-      ImageRGBA8 img → writePng outFile
-                         $ T.flip img
+      ImageRGBA8 img → writePng outFile $ f img
       _              → putStrLn "Type not handled yet."
-run (Add imgPaths outFile) = do
+run (MultiT imgPaths outFile f) = do
   imgsLoad ← mapM readImage imgPaths
   case partitionEithers imgsLoad of
     ([], images@(_:_)) →
       case mapM unwrapImage images of
-        Just imgs → writePng outFile $ foldl1 Arith.add imgs
+        Just imgs → writePng outFile $ f imgs
         Nothing   → putStrLn "Type not handled yet."
     (errs, _)  → mapM_ putStrLn errs
-run (Red inFile n outFile) = do
+run (ArgT inFile n outFile f) = do
   imageLoad ← readImage inFile
   case imageLoad of
-    Left error → putStrLn error
+    Left error  → putStrLn error
     Right image → case image of
-      ImageRGBA8 img → writePng outFile
-                       $ T.changeRed n img
-      _              → putStrLn "Type not handled yet."
-run (Green inFile n outFile) = do
-  imageLoad ← readImage inFile
-  case imageLoad of
-    Left error → putStrLn error
-    Right image → case image of
-      ImageRGBA8 img → writePng outFile
-                       $ T.changeGreen n img
-      _              → putStrLn "Type not handled yet."
-run (Blue inFile n outFile) = do
-  imageLoad ← readImage inFile
-  case imageLoad of
-    Left error → putStrLn error
-    Right image → case image of
-      ImageRGBA8 img → writePng outFile
-                       $ T.changeBlue n img
+      ImageRGBA8 img → writePng outFile $ f n img
       _              → putStrLn "Type not handled yet."
 
 main ∷ IO ()
