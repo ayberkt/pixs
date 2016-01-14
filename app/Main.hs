@@ -34,7 +34,7 @@ magnitudeOption = (A.option A.auto
                    (   A.long "magnitude"
                     <> A.short 'm'
                     <> A.metavar "MAGNITUDE"
-                    <> A.help "Magnitude of brightness change"))
+                    <> A.help "Magnitude of change"))
 
 brightness ∷ Parser Command
 brightness = Brightness
@@ -51,6 +51,18 @@ red =  Red
    <$> inputOption
    <*> magnitudeOption
    <*> outputOption
+
+green ∷ Parser Command
+green =  Green
+     <$> inputOption
+     <*> magnitudeOption
+     <*> outputOption
+
+blue ∷ Parser Command
+blue =  Blue
+    <$> inputOption
+    <*> magnitudeOption
+    <*> outputOption
 
 flip ∷ Parser Command
 flip = Flip <$> inputOption <*> outputOption
@@ -77,6 +89,12 @@ menu = A.subparser
          <> A.command "red"
              (A.info red
                      (A.progDesc "Change the red component of a given image."))
+         <> A.command "blue"
+             (A.info blue
+                     (A.progDesc "Change the blue component of a given image."))
+         <> A.command "green"
+              (A.info green
+                      (A.progDesc "Change the green component of a given image."))
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img
@@ -115,7 +133,22 @@ run (Red inFile n outFile) = do
       ImageRGBA8 img → writePng outFile
                        $ T.changeRed n img
       _              → putStrLn "Type not handled yet."
-
+run (Green inFile n outFile) = do
+  imageLoad ← readImage inFile
+  case imageLoad of
+    Left error → putStrLn error
+    Right image → case image of
+      ImageRGBA8 img → writePng outFile
+                       $ T.changeGreen n img
+      _              → putStrLn "Type not handled yet."
+run (Blue inFile n outFile) = do
+  imageLoad ← readImage inFile
+  case imageLoad of
+    Left error → putStrLn error
+    Right image → case image of
+      ImageRGBA8 img → writePng outFile
+                       $ T.changeBlue n img
+      _              → putStrLn "Type not handled yet."
 
 main ∷ IO ()
 main = let opts = A.info (A.helper <*> menu)
