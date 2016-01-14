@@ -58,9 +58,9 @@ prop_double_flip_ID img = if imageWidth img >= 0 && imageHeight img >= 0
                           then T.flipVertical (T.flipVertical  img) == img
                           else True
 
-double_apply_ID :: (Image PixelRGBA8 -> Image PixelRGBA8)
-                -> Image PixelRGBA8
-                -> Bool
+double_apply_ID ∷ (Image PixelRGBA8 -> Image PixelRGBA8)
+                → Image PixelRGBA8
+                → Bool
 double_apply_ID f img = if imageWidth img >= 0 && imageHeight img >= 0
                         then (f $ f img) == img
                         else True
@@ -86,14 +86,21 @@ prop_red_correct a (Positive x) (Positive y) img
          in r' == (r T.⊕ x)
     else True
 
-prop_image_add_assoc ∷ Image PixelRGBA8 → Image PixelRGBA8 → Bool
-prop_image_add_assoc img₁ img₂ = if cond1 && cond2 && cond3 && cond4
-                                then (A.add img₁ img₂) == (A.add img₂ img₁)
-                                else True
-  where cond1 = (imageWidth img₁) >= 0
-        cond2 = (imageHeight img₁) >= 0
-        cond3 = (imageWidth img₂) >= 0
-        cond4 = (imageHeight img₂) >= 0
+sides ∷ [Image a] → [Int]
+sides = (>>= \x → [imageWidth x, imageHeight x])
+
+prop_image_add_comm ∷ Image PixelRGBA8 → Image PixelRGBA8 → Bool
+prop_image_add_comm img₁ img₂ =
+     (any (< 0) $ sides [img₁, img₂])
+  || (img₁ `A.add` img₂) == (img₂ `A.add` img₁)
+
+prop_image_add_assoc ∷ Image PixelRGBA8
+                     → Image PixelRGBA8
+                     → Image PixelRGBA8
+                     → Bool
+prop_image_add_assoc img₁ img₂ img₃ =
+     (any (< 0) $ sides [img₁, img₂, img₃])
+  || (img₁ `A.add` (img₂ `A.add` img₃)) == ((img₁ `A.add` img₂) `A.add` img₃)
 
 main ∷ IO ()
 main = hspec $ do
@@ -131,7 +138,9 @@ main = hspec $ do
     it "handles normal case" $
       let p = PixelRGBA8 250 250 250 250
       in negate p `shouldBe` PixelRGBA8 5 5 5 255
-  describe "Image addition" $
+  describe "Image addition" $ do
+    it "is commutative" $ property
+      prop_image_add_comm
     it "is associative" $ property
       prop_image_add_assoc
   describe "Red adjustment" $ do
