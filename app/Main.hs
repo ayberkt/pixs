@@ -1,4 +1,4 @@
-{-# LANGUAGE UnicodeSyntax, ViewPatterns #-}
+{-# LANGUAGE UnicodeSyntax #-}
 
 import           Data.Either                (partitionEithers)
 import           Codec.Picture              (DynamicImage (..), Image,
@@ -7,7 +7,7 @@ import           Codec.Picture              (DynamicImage (..), Image,
 -- import qualified Pixs.Information.Histogram as H
 import qualified Pixs.Transformation        as T
 import qualified Pixs.Arithmetic            as Arith
-import           Prelude                    hiding (error, flip)
+import           Prelude                    hiding (error, flip, and)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
@@ -77,6 +77,15 @@ add = MultiT
     <*> outputOption
     <*> pure (foldl1 Arith.add)
 
+and ∷ Parser CommandType
+and =   MultiT
+    <$> (A.many $ A.strOption
+          (   A.long "img"
+           <> A.metavar "IMAGE"
+           <> A.help "Image to be and'ed"))
+    <*> outputOption
+    <*> pure (foldl1 Arith.and)
+
 menu ∷ Parser CommandType
 menu = A.subparser
          $  A.command "brightness"
@@ -97,6 +106,9 @@ menu = A.subparser
          <> A.command "green"
               (A.info green
                       (A.progDesc "Change the green component of a given image."))
+         <> A.command "and"
+              (A.info and
+                      (A.progDesc "Bitwise-and multiple images together."))
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img
