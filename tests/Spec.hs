@@ -139,9 +139,9 @@ main = hspec $ do
     it "is associative" $ property $
       prop_pixel_assoc (+)
     it "correctly adds two arbitrary pixels" $
-      let p₁ = PixelRGBA8 20 20 20 20
+      let p₁ = PixelRGBA8 21 21 21 21
           p₂ = PixelRGBA8 30 30 30 30
-      in p₁ + p₂ `shouldBe` PixelRGBA8 50 50 50 30
+      in p₁ + p₂ `shouldBe` PixelRGBA8 51 51 51 30
     it "handles overflow" $
       let p₁ = PixelRGBA8 250 250 250 250
           p₂ = PixelRGBA8 20  20  20  20
