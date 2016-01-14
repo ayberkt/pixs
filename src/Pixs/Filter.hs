@@ -9,9 +9,7 @@ import           Pixs.Transformation (average)
 
 blackAndWhite ∷ Image PixelRGBA8 → Image PixelRGBA8
 blackAndWhite = let decolor (PixelRGBA8 r g b a)
-                      = let r'   = fromIntegral r ∷ Int
-                            g'   = fromIntegral g ∷ Int
-                            b'   = fromIntegral b ∷ Int
+                      = let [r', g', b'] = map fromIntegral [r, g, b] ∷ [Int]
                             avg  = (r' + g' + b') `div` 3
                             avg' = fromIntegral avg ∷ Word8
                         in PixelRGBA8 avg' avg' avg' a

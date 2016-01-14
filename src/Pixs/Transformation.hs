@@ -33,20 +33,23 @@ import Codec.Picture( PixelRGBA8(..)
                     , pixelAt
                     , generateImage)
 
+limit ∷ (Num c, Ord c) ⇒ c → c
+limit = min 0 . max 255
+
 -- | Used for reducing repetition when declaring Num instance.
 --   Our strategy for overflow/underflow checking is the same for all of the
 --   operations so we define this function that takes in an operation and two
 --   pixels and applies the operation to the components. Pixel addition for
 --   example is implemented by simply passing (+) to `applyOp`.
 applyOp ∷ (Int → Int → Int) → PixelRGBA8 → PixelRGBA8 → PixelRGBA8
-applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
-  = PixelRGBA8 r g b (max a₁ a₂)
+applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂) =
+    PixelRGBA8 r g b (max a₁ a₂)
   where r' = (fromIntegral r₁ `op` fromIntegral r₂)
         g' = (fromIntegral g₁ `op` fromIntegral g₂)
         b' = (fromIntegral b₁ `op` fromIntegral b₂)
-        r  = fromIntegral . max 0 . min 255 $ r'   ∷ Word8
-        g  = fromIntegral . max 0 . min 255 $ g'   ∷ Word8
-        b  = fromIntegral . max 0 . min 255 $ b'   ∷ Word8
+        r  = fromIntegral . limit $ r'   ∷ Word8
+        g  = fromIntegral . limit $ g'   ∷ Word8
+        b  = fromIntegral . limit $ b'   ∷ Word8
 
 --   TODO: PixelRGBA8 should not really have an instance of
 --   Num since it doesn't behave like a number. For
@@ -57,9 +60,7 @@ applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
 instance Num PixelRGBA8 where
 
   negate (PixelRGBA8 r g b _) = PixelRGBA8 r' g' b' 255
-    where r' = 255 - r
-          g' = 255 - g
-          b' = 255 - b
+    where (r', g', b') = (255 - r, 255 - g, 255 - b)
 
   (+) = applyOp (+)
 
@@ -73,15 +74,15 @@ instance Num PixelRGBA8 where
 
   fromInteger _ = undefined
 
+
 pixelDiv ∷ PixelRGBA8 → PixelRGBA8 → PixelRGBA8
 pixelDiv = applyOp div
 
 -- | Flow-checked addition operation which we denote with ⊕.
 -- Also has an ASCII alias `safeAdd`.
 (⊕) ∷ Word8 → Int → Word8
-(⊕) x y = let x' = (fromIntegral x) ∷ Int
-              y' = (fromIntegral y) ∷ Int
-          in fromIntegral . max 0 . min 255 $ x' + y'
+(⊕) x y = let x' = fromIntegral x ∷ Int
+          in fromIntegral . limit $ x' + y
 
 safeAdd ∷ Word8 → Int → Word8
 safeAdd = (⊕)
@@ -90,29 +91,21 @@ safeAdd = (⊕)
 -- Also has an ASCII alias `safeMultiply`.
 (⊗) ∷ Word8 → Int → Word8
 (⊗) x y = let x' = (fromIntegral x) ∷ Int
-              y' = (fromIntegral y) ∷ Int
-          in fromIntegral . max 0 . min 255 $ x' * y'
+          in fromIntegral . limit $ x' * y
 
 safeMultiply ∷ Word8 → Int → Word8
 safeMultiply = (⊗)
 
 -- | Scalar multiplication.
 scale ∷ Double → PixelRGBA8 → PixelRGBA8
-scale n (PixelRGBA8 r g b a) = let r' = (fromIntegral r) ∷ Double
-                                   g' = (fromIntegral g) ∷ Double
-                                   b' = (fromIntegral b) ∷ Double
-                                   [r'', g'', b''] = map (* n) [r', g', b']
-                                   rFin = round . max 0 . min 255 $ r''
-                                   gFin = round . max 0 . min 255 $ g''
-                                   bFin = round . max 0 . min 255 $ b''
-                               in PixelRGBA8 rFin gFin bFin a
+scale n (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
+  where
+    [r', g', b'] = map (round . limit . (* n) . fromIntegral) [r, g, b]
 
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
   where changeBrightness' (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
-          where r' = r ⊕ amount
-                g' = g ⊕ amount
-                b' = b ⊕ amount
+          where [r', g', b'] = map (⊕ amount) [r, g, b]
 
 changeRed ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeRed amount = pixelMap changeRed'

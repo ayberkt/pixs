@@ -65,12 +65,25 @@ double_apply_ID f img = if imageWidth img >= 0 && imageHeight img >= 0
                         then (f $ f img) == img
                         else True
 
-prop_pixel_add_comm ∷ PixelRGBA8 → PixelRGBA8 → Bool
-prop_pixel_add_comm p₁ p₂ = p₁ + p₂ == p₂ + p₁
+prop_pixel_comm ∷ (PixelRGBA8 → PixelRGBA8 → PixelRGBA8)
+                → PixelRGBA8
+                → PixelRGBA8
+                → Bool
+prop_pixel_comm op p₁ p₂ = p₁ `op` p₂ == p₂ `op` p₁
 
-prop_pixel_add_assoc ∷ PixelRGBA8 → PixelRGBA8 → PixelRGBA8 → Bool
-prop_pixel_add_assoc p₁ p₂ p₃ = (p₁ + p₂) + p₃ == p₁ + (p₂ + p₃)
+prop_pixel_assoc ∷ (PixelRGBA8 → PixelRGBA8 → PixelRGBA8)
+                 → PixelRGBA8
+                 → PixelRGBA8
+                 → PixelRGBA8
+                 → Bool
+prop_pixel_assoc op p₁ p₂ p₃ = (p₁ `op` p₂) `op` p₃ == p₁ `op` (p₂ `op` p₃)
 
+prop_pixel_dist ∷ (PixelRGBA8 → PixelRGBA8 → PixelRGBA8)
+                → PixelRGBA8
+                → PixelRGBA8
+                → PixelRGBA8
+                → Bool
+prop_pixel_dist op p₁ p₂ p₃ = (p₁ `op` p₂) `op` p₃ == p₁ `op` (p₂ `op` p₃)
 
 prop_change_red_ID ∷ Int → Image PixelRGBA8 → Bool
 prop_change_red_ID x img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
@@ -89,18 +102,22 @@ prop_red_correct a (Positive x) (Positive y) img
 sides ∷ [Image a] → [Int]
 sides = (>>= \x → [imageWidth x, imageHeight x])
 
-prop_image_add_comm ∷ Image PixelRGBA8 → Image PixelRGBA8 → Bool
-prop_image_add_comm img₁ img₂ =
+prop_image_comm ∷ (Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8)
+                → Image PixelRGBA8
+                → Image PixelRGBA8
+                → Bool
+prop_image_comm op img₁ img₂ =
      (any (< 0) $ sides [img₁, img₂])
-  || (img₁ `A.add` img₂) == (img₂ `A.add` img₁)
+  || (img₁ `op` img₂) == (img₂ `op` img₁)
 
-prop_image_add_assoc ∷ Image PixelRGBA8
-                     → Image PixelRGBA8
-                     → Image PixelRGBA8
-                     → Bool
-prop_image_add_assoc img₁ img₂ img₃ =
+prop_image_assoc ∷ (Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8)
+                 → Image PixelRGBA8
+                 → Image PixelRGBA8
+                 → Image PixelRGBA8
+                 → Bool
+prop_image_assoc op img₁ img₂ img₃ =
      (any (< 0) $ sides [img₁, img₂, img₃])
-  || (img₁ `A.add` (img₂ `A.add` img₃)) == ((img₁ `A.add` img₂) `A.add` img₃)
+  || (img₁ `op` (img₂ `op` img₃)) == ((img₁ `op` img₂) `op` img₃)
 
 main ∷ IO ()
 main = hspec $ do
@@ -117,10 +134,10 @@ main = hspec $ do
     it "gives identity when applied twice" $ property $
       double_apply_ID T.flip
   describe "Pixel addition" $ do
-    it "is commutative" $ property
-      prop_pixel_add_comm
-    it "is associative" $ property
-      prop_pixel_add_assoc
+    it "is commutative" $ property $
+      prop_pixel_comm (+)
+    it "is associative" $ property $
+      prop_pixel_assoc (+)
     it "correctly adds two arbitrary pixels" $
       let p₁ = PixelRGBA8 20 20 20 20
           p₂ = PixelRGBA8 30 30 30 30
@@ -138,11 +155,21 @@ main = hspec $ do
     it "handles normal case" $
       let p = PixelRGBA8 250 250 250 250
       in negate p `shouldBe` PixelRGBA8 5 5 5 255
+  describe "Pixel multiplication" $ do
+    it "is commutative" $ property $
+      prop_pixel_comm (*)
+    it "is associative" $ property $
+      prop_pixel_assoc (*)
   describe "Image addition" $ do
-    it "is commutative" $ property
-      prop_image_add_comm
-    it "is associative" $ property
-      prop_image_add_assoc
+    it "is commutative" $ property $
+      prop_image_comm A.add
+    it "is associative" $ property $
+      prop_image_assoc A.add
+  describe "Image multiplication" $ do
+    it "is commutative" $ property $
+      prop_image_comm A.multiply
+    it "is associative" $ property $
+      prop_image_assoc A.multiply
   describe "Red adjustment" $ do
     it "is correct" $ property $
       prop_red_correct

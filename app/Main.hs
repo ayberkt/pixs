@@ -7,7 +7,7 @@ import           Codec.Picture              (DynamicImage (..), Image,
 -- import qualified Pixs.Information.Histogram as H
 import qualified Pixs.Transformation        as T
 import qualified Pixs.Arithmetic            as Arith
-import           Prelude                    hiding (error, flip, and)
+import           Prelude                    hiding (error, flip, and, or)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
@@ -86,6 +86,15 @@ and =   MultiT
     <*> outputOption
     <*> pure (foldl1 Arith.and)
 
+or ∷ Parser CommandType
+or = MultiT
+    <$> (A.many $ A.strOption
+          (   A.long "img"
+           <> A.metavar "IMAGE"
+           <> A.help "Image to be or'ed"))
+    <*> outputOption
+    <*> pure (foldl1 Arith.or)
+
 menu ∷ Parser CommandType
 menu = A.subparser
          $  A.command "brightness"
@@ -109,6 +118,9 @@ menu = A.subparser
          <> A.command "and"
               (A.info and
                       (A.progDesc "Bitwise-and multiple images together."))
+         <> A.command "or"
+              (A.info or
+                      (A.progDesc "Bitwise-or multiple images together."))
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img

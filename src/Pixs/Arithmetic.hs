@@ -3,6 +3,7 @@
 module Pixs.Arithmetic where
 
 import           Codec.Picture          ( PixelRGBA8(..)
+                                        , Pixel8
                                         , Image(..)
                                         -- , pixelMap
                                         , imageHeight
@@ -12,7 +13,7 @@ import           Codec.Picture          ( PixelRGBA8(..)
 
 import           Pixs.Transformation()
 import           Pixs.Transformation    (pixelDiv, scale)
-import           Data.Bits              ((.&.))
+import           Data.Bits              ((.&.), (.|.))
 import           Prelude   hiding       (sum)
 
 -- | Takes as input two identically sized images @img₁@ and @img₂@, and produces
@@ -41,20 +42,27 @@ divide img₁ img₂ = let x ÷ y = (pixelAt img₁ x y) `pixelDiv` (pixelAt img
 
 blend ∷ Image PixelRGBA8 → Image PixelRGBA8 → Double → Image PixelRGBA8
 blend img₁ img₂ n = let x % y = n `scale` (pixelAt img₁ x y) + (pixelAt img₂ x y)
-                  in generateImage (%) (imageWidth img₁) (imageHeight img₂)
+                    in generateImage (%) (imageWidth img₁) (imageHeight img₂)
+
+bitwiseImageOp ∷ (Pixel8 → Pixel8 → Pixel8)
+               → Image PixelRGBA8
+               → Image PixelRGBA8
+               → Image PixelRGBA8
+bitwiseImageOp op img₁ img₂ =
+  let pixelAnd (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂) =
+        PixelRGBA8 (r₁ `op` r₂) (g₁ `op` g₂) (b₁ `op` b₂) (max a₁ a₂)
+      pixelAnd' x y = pixelAnd (pixelAt img₁ x y) (pixelAt img₂ x y)
+  in generateImage pixelAnd' (imageWidth img₁) (imageHeight img₂)
 
 -- | Create a new image by and'ing (i.e., @(.&.)@ from @Data.Bits@) each color
 -- component of every two corresponding pixel from @img₁@ and @img₂@.
 and ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
-and img₁ img₂ = let pixelAnd (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
-                      = PixelRGBA8 (r₁ .&. r₂) (g₁ .&. g₂) (b₁ .&. b₂) (max a₁ a₂)
-                    pixelAnd' x y = pixelAnd (pixelAt img₁ x y)
-                                             (pixelAt img₂ x y)
-                in generateImage pixelAnd' (imageWidth img₁) (imageHeight img₂)
+and = bitwiseImageOp (.&.)
 
--- TODO
--- or ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
--- or img₁ img₂ = undefined
+-- | Create a new image by or'ing (i.e., @(.|.)@ from @Data.Bits@) each color
+-- component of every two corresponding pixel from @img₁@ and @img₂@.
+or ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
+or = bitwiseImageOp (.|.)
 
 -- TODO
 -- invert ∷ Image PixelRGBA8 → Image PixelRGBA8
