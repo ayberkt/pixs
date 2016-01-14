@@ -11,7 +11,7 @@ import           Codec.Picture          ( PixelRGBA8(..)
                                         , generateImage)
 
 import           Pixs.Transformation()
--- import           Data.Word              (Word8)
+import           Pixs.Transformation    (pixelDiv, scale)
 import           Data.Bits              ((.&.))
 import           Prelude   hiding       (sum)
 
@@ -36,11 +36,12 @@ multiply img₁ img₂ = let mul x y = (pixelAt img₁ x y) - (pixelAt img₂ x 
                      in generateImage mul (imageWidth img₁) (imageHeight img₂)
 
 divide ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
-divide img₁ img₂ = let div x y = (pixelAt img₁ x y) `div` (pixelAt img₂ x y)
-                   in generateImage div (imageWidth img₁) (imageHeight img₂)
+divide img₁ img₂ = let x ÷ y = (pixelAt img₁ x y) `pixelDiv` (pixelAt img₂ x y)
+                   in generateImage (÷) (imageWidth img₁) (imageHeight img₂)
 
--- blend ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
--- blend img₁ img₂ = undefined
+blend ∷ Image PixelRGBA8 → Image PixelRGBA8 → Double → Image PixelRGBA8
+blend img₁ img₂ n = let x % y = n `scale` (pixelAt img₁ x y) + (pixelAt img₂ x y)
+                  in generateImage (%) (imageWidth img₁) (imageHeight img₂)
 
 -- | Create a new image by and'ing (i.e., @(.&.)@ from @Data.Bits@) each color
 -- component of every two corresponding pixel from @img₁@ and @img₂@.

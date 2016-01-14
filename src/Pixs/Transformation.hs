@@ -16,7 +16,9 @@ module Pixs.Transformation ( blur
                            , (⊕)
                            , safeAdd
                            , (⊗)
-                           , safeMultiply) where
+                           , safeMultiply
+                           , pixelDiv
+                           , scale) where
 
 
 import Prelude hiding (flip)
@@ -71,6 +73,9 @@ instance Num PixelRGBA8 where
 
   fromInteger _ = undefined
 
+pixelDiv ∷ PixelRGBA8 → PixelRGBA8 → PixelRGBA8
+pixelDiv = applyOp div
+
 -- | Flow-checked addition operation which we denote with ⊕.
 -- Also has an ASCII alias `safeAdd`.
 (⊕) ∷ Word8 → Int → Word8
@@ -92,8 +97,15 @@ safeMultiply ∷ Word8 → Int → Word8
 safeMultiply = (⊗)
 
 -- | Scalar multiplication.
--- scale ∷ Int → PixelRGBA8 → PixelRGBA8
--- scale n (PixelRGBA8 r g b a) = PixelRGBA8 (r ⊗ n) (g ⊗ n) (b ⊗ n) a
+scale ∷ Double → PixelRGBA8 → PixelRGBA8
+scale n (PixelRGBA8 r g b a) = let r' = (fromIntegral r) ∷ Double
+                                   g' = (fromIntegral g) ∷ Double
+                                   b' = (fromIntegral b) ∷ Double
+                                   [r'', g'', b''] = map (* n) [r', g', b']
+                                   rFin = round . max 0 . min 255 $ r''
+                                   gFin = round . max 0 . min 255 $ g''
+                                   bFin = round . max 0 . min 255 $ b''
+                               in PixelRGBA8 rFin gFin bFin a
 
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
