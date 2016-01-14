@@ -2,12 +2,11 @@
 
 import           Codec.Picture              (DynamicImage (..), readImage,
                                              writePng)
-import qualified Pixs.Filter                as F
-import qualified Pixs.Information.Histogram as H
+-- import qualified Pixs.Filter                as F
+-- import qualified Pixs.Information.Histogram as H
 import qualified Pixs.Transformation        as T
 import qualified Pixs.Arithmetic            as Arith
 import           Prelude                    hiding (error, flip)
-import           System.Environment         (getArgs)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
@@ -75,6 +74,7 @@ run (Brightness inFile n outFile) = do
     Right image → case image of
       ImageRGBA8 img → writePng outFile
                          $ T.changeBrightness n img
+      _              → putStrLn "Type not handled yet."
 run (Flip inFile outFile) = do
   imageLoad ← readImage inFile
   case imageLoad of
@@ -82,9 +82,10 @@ run (Flip inFile outFile) = do
     Right image → case image of
       ImageRGBA8 img → writePng outFile
                          $ T.flip img
-run (Add img₁ img₂ outFile) = do
-  imgLoad₁ ← readImage img₁
-  imgLoad₂ ← readImage img₂
+      _              → putStrLn "Type not handled yet."
+run (Add imgPath₁ imgPath₂ outFile) = do
+  imgLoad₁ ← readImage imgPath₁
+  imgLoad₂ ← readImage imgPath₂
   case [imgLoad₁, imgLoad₂] of
     [Right (ImageRGBA8 img₁), Right (ImageRGBA8 img₂)] →
       writePng outFile
