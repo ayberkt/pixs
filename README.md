@@ -9,8 +9,8 @@ command-line interface to `Pixs`.
   - [x] Addition
   - [x] Subtraction
   - [x] Multiplication
-  - [ ] Division
-  - [ ] Blending
+  - [x] Division
+  - [x] Blending
   - [x] Logical AND/NAND
   - [ ] Logical OR/NOR
   - [ ] Logical XOR/XNOR
