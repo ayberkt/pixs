@@ -43,12 +43,23 @@ limit = min 0 . max 255
 --   pixels and applies the operation to the components. Pixel addition for
 --   example is implemented by simply passing (+) to `applyOp`.
 applyOp ∷ (Int → Int → Int) → PixelRGBA8 → PixelRGBA8 → PixelRGBA8
-applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂) =
-    PixelRGBA8 r g b (max a₁ a₂)
-  where
-    [r, g, b] = map (fromIntegral . limit
-                     . uncurry op . (fromIntegral *** fromIntegral))
-                    [(r₁, r₂), (g₁, g₂), (b₁, b₂)] ∷ [Word8]
+applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
+  = PixelRGBA8 r g b (max a₁ a₂)
+  where r' = (fromIntegral r₁ `op` fromIntegral r₂)
+        g' = (fromIntegral g₁ `op` fromIntegral g₂)
+        b' = (fromIntegral b₁ `op` fromIntegral b₂)
+        r  = fromIntegral . max 0 . min 255 $ r'   ∷ Word8
+        g  = fromIntegral . max 0 . min 255 $ g'   ∷ Word8
+        b  = fromIntegral . max 0 . min 255 $ b'   ∷ Word8
+-- `applyOp` will eventually be refactored to look something like this
+-- applyOp ∷ (Int → Int → Int) → PixelRGBA8 → PixelRGBA8 → PixelRGBA8
+-- applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂) =
+--     PixelRGBA8 r g b (max a₁ a₂)
+--   where
+--     [r, g, b] = map (fromIntegral . limit
+--                      . uncurry op . (fromIntegral *** fromIntegral))
+--                     [(r₁, r₂), (g₁, g₂), (b₁, b₂)] ∷ [Word8]
+
 
 --   TODO: PixelRGBA8 should not really have an instance of
 --   Num since it doesn't behave like a number. For
