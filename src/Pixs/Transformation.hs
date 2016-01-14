@@ -22,6 +22,7 @@ module Pixs.Transformation ( blur
 
 
 import Prelude hiding (flip)
+import Control.Arrow ((***))
 import Data.Word
 import Data.Maybe (catMaybes)
 import Codec.Picture( PixelRGBA8(..)
@@ -44,12 +45,10 @@ limit = min 0 . max 255
 applyOp ∷ (Int → Int → Int) → PixelRGBA8 → PixelRGBA8 → PixelRGBA8
 applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂) =
     PixelRGBA8 r g b (max a₁ a₂)
-  where r' = (fromIntegral r₁ `op` fromIntegral r₂)
-        g' = (fromIntegral g₁ `op` fromIntegral g₂)
-        b' = (fromIntegral b₁ `op` fromIntegral b₂)
-        r  = fromIntegral . limit $ r'   ∷ Word8
-        g  = fromIntegral . limit $ g'   ∷ Word8
-        b  = fromIntegral . limit $ b'   ∷ Word8
+  where
+    [r, g, b] = map (fromIntegral . limit
+                     . uncurry op . (fromIntegral *** fromIntegral))
+                    [(r₁, r₂), (g₁, g₂), (b₁, b₂)] ∷ [Word8]
 
 --   TODO: PixelRGBA8 should not really have an instance of
 --   Num since it doesn't behave like a number. For
