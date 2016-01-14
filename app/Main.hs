@@ -12,6 +12,9 @@ import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
 data Command = Brightness FilePath   Int      FilePath
+             | Red        FilePath   Int      FilePath
+             | Green      FilePath   Int      FilePath
+             | Blue       FilePath   Int      FilePath
              | Flip       FilePath   FilePath
              | Add        [FilePath] FilePath
              deriving (Eq, Read)
@@ -26,6 +29,13 @@ outputOption = A.strOption (   A.long "out"
                             <> A.metavar "OUTPUT"
                             <> A.help "File name to write to.")
 
+magnitudeOption ∷ Parser Int
+magnitudeOption = (A.option A.auto
+                   (   A.long "magnitude"
+                    <> A.short 'm'
+                    <> A.metavar "MAGNITUDE"
+                    <> A.help "Magnitude of change"))
+
 brightness ∷ Parser Command
 brightness = Brightness
     <$> inputOption
@@ -34,6 +44,24 @@ brightness = Brightness
             <> A.short 'm'
             <> A.metavar "MAGNITUDE"
             <> A.help "Magnitude of brightness change"))
+    <*> outputOption
+
+red ∷ Parser Command
+red =  Red
+   <$> inputOption
+   <*> magnitudeOption
+   <*> outputOption
+
+green ∷ Parser Command
+green =  Green
+     <$> inputOption
+     <*> magnitudeOption
+     <*> outputOption
+
+blue ∷ Parser Command
+blue =  Blue
+    <$> inputOption
+    <*> magnitudeOption
     <*> outputOption
 
 flip ∷ Parser Command
@@ -58,6 +86,15 @@ menu = A.subparser
          <> A.command "add"
              (A.info add
                      (A.progDesc "Add one or more images together."))
+         <> A.command "red"
+             (A.info red
+                     (A.progDesc "Change the red component of a given image."))
+         <> A.command "blue"
+             (A.info blue
+                     (A.progDesc "Change the blue component of a given image."))
+         <> A.command "green"
+              (A.info green
+                      (A.progDesc "Change the green component of a given image."))
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img
@@ -88,6 +125,30 @@ run (Add imgPaths outFile) = do
         Just imgs → writePng outFile $ foldl1 Arith.add imgs
         Nothing   → putStrLn "Type not handled yet."
     (errs, _)  → mapM_ putStrLn errs
+run (Red inFile n outFile) = do
+  imageLoad ← readImage inFile
+  case imageLoad of
+    Left error → putStrLn error
+    Right image → case image of
+      ImageRGBA8 img → writePng outFile
+                       $ T.changeRed n img
+      _              → putStrLn "Type not handled yet."
+run (Green inFile n outFile) = do
+  imageLoad ← readImage inFile
+  case imageLoad of
+    Left error → putStrLn error
+    Right image → case image of
+      ImageRGBA8 img → writePng outFile
+                       $ T.changeGreen n img
+      _              → putStrLn "Type not handled yet."
+run (Blue inFile n outFile) = do
+  imageLoad ← readImage inFile
+  case imageLoad of
+    Left error → putStrLn error
+    Right image → case image of
+      ImageRGBA8 img → writePng outFile
+                       $ T.changeBlue n img
+      _              → putStrLn "Type not handled yet."
 
 main ∷ IO ()
 main = let opts = A.info (A.helper <*> menu)
