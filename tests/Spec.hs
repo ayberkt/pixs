@@ -162,6 +162,8 @@ main = hspec $ do
       prop_pixel_comm (*)
     it "is associative" $ property $
       prop_pixel_assoc (*)
+    it "is distributive" $ property $
+      prop_pixel_dist (*)
   describe "Image addition" $ do
     it "is commutative" $ property $
       prop_image_comm A.add
