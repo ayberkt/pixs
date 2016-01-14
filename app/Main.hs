@@ -7,7 +7,7 @@ import           Codec.Picture              (DynamicImage (..), Image,
 -- import qualified Pixs.Information.Histogram as H
 import qualified Pixs.Transformation        as T
 import qualified Pixs.Arithmetic            as Arith
-import           Prelude                    hiding (error, flip)
+import           Prelude                    hiding (error, flip, and)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
@@ -17,6 +17,7 @@ data Command = Brightness FilePath   Int      FilePath
              | Blue       FilePath   Int      FilePath
              | Flip       FilePath   FilePath
              | Add        [FilePath] FilePath
+             | And        [FilePath] FilePath
              deriving (Eq, Read)
 
 inputOption ∷ Parser FilePath
@@ -75,6 +76,14 @@ add = Add
             <> A.help "Image to be added"))
     <*> outputOption
 
+and ∷ Parser Command
+and =   And
+    <$> (A.many $ A.strOption
+          (   A.long "img"
+           <> A.metavar "IMAGE"
+           <> A.help "Image to be and'ed"))
+    <*> outputOption
+
 menu ∷ Parser Command
 menu = A.subparser
          $  A.command "brightness"
@@ -95,6 +104,9 @@ menu = A.subparser
          <> A.command "green"
               (A.info green
                       (A.progDesc "Change the green component of a given image."))
+         <> A.command "and"
+              (A.info and
+                      (A.progDesc "Bitwise-and multiple images together."))
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img
@@ -125,6 +137,14 @@ run (Add imgPaths outFile) = do
         Just imgs → writePng outFile $ foldl1 Arith.add imgs
         Nothing   → putStrLn "Type not handled yet."
     (errs, _)  → mapM_ putStrLn errs
+run (And imgPaths outFile) = do
+  imgsLoad ← mapM readImage imgPaths
+  case partitionEithers imgsLoad of
+    ([], images@(_:_)) →
+      case mapM unwrapImage images of
+        Just imgs → writePng outFile $ foldl1 Arith.add imgs
+        Nothing   → putStrLn "Type not handled yet."
+    (errs, _) → mapM_ putStrLn errs
 run (Red inFile n outFile) = do
   imageLoad ← readImage inFile
   case imageLoad of
