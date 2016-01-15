@@ -79,11 +79,14 @@ prop_pixel_assoc ∷ (PixelRGBA8 → PixelRGBA8 → PixelRGBA8)
 prop_pixel_assoc op p₁ p₂ p₃ = (p₁ `op` p₂) `op` p₃ == p₁ `op` (p₂ `op` p₃)
 
 prop_pixel_dist ∷ (PixelRGBA8 → PixelRGBA8 → PixelRGBA8)
+                → (PixelRGBA8 → PixelRGBA8 → PixelRGBA8)
                 → PixelRGBA8
                 → PixelRGBA8
                 → PixelRGBA8
                 → Bool
-prop_pixel_dist op p₁ p₂ p₃ = (p₁ `op` p₂) `op` p₃ == p₁ `op` (p₂ `op` p₃)
+prop_pixel_dist op₁ op₂ p₁ p₂ p₃ =
+     p₁ `op₁` (p₂ `op₂` p₃) == (p₁ `op₁` p₂) `op₂` (p₁ `op₁` p₃)
+  && (p₂ `op₂` p₃) `op₁` p₁ == (p₂ `op₁` p₁) `op₂` (p₃ `op₁` p₁)
 
 prop_change_red_ID ∷ Int → Image PixelRGBA8 → Bool
 prop_change_red_ID x img = if (imageWidth img) >= 0 && (imageHeight img) >= 0
@@ -138,8 +141,6 @@ main = hspec $ do
       prop_pixel_comm (+)
     it "is associative" $ property $
       prop_pixel_assoc (+)
-    it "is distributive" $ property $
-      prop_pixel_dist (+)
     it "correctly adds two arbitrary pixels" $
       let p₁ = PixelRGBA8 21 21 21 21
           p₂ = PixelRGBA8 30 30 30 30
@@ -162,8 +163,8 @@ main = hspec $ do
       prop_pixel_comm (*)
     it "is associative" $ property $
       prop_pixel_assoc (*)
-    it "is distributive" $ property $
-      prop_pixel_dist (*)
+    it "is distributive over addition" $ property $
+      prop_pixel_dist (*) (+)
   describe "Image addition" $ do
     it "is commutative" $ property $
       prop_image_comm A.add

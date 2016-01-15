@@ -10,6 +10,7 @@ module Pixs.Transformation ( blur
                            , changeBlue
                            , addAlphaChannel
                            , changeBrightness
+                           , changeContrast
                            , negateImage
                            , saturation
                            , getPixel
@@ -37,7 +38,7 @@ import Codec.Picture( PixelRGBA8(..)
                     , generateImage)
 
 limit ∷ (Num c, Ord c) ⇒ c → c
-limit = min 0 . max 255
+limit = max 0 . min 255
 
 -- | Used for reducing repetition when declaring Num instance.
 --   Our strategy for overflow/underflow checking is the same for all of the
@@ -47,21 +48,11 @@ limit = min 0 . max 255
 applyOp ∷ (Int → Int → Int) → PixelRGBA8 → PixelRGBA8 → PixelRGBA8
 applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
   = PixelRGBA8 r g b (max a₁ a₂)
-  where r' = (fromIntegral r₁ `op` fromIntegral r₂)
-        g' = (fromIntegral g₁ `op` fromIntegral g₂)
-        b' = (fromIntegral b₁ `op` fromIntegral b₂)
-        r  = fromIntegral . max 0 . min 255 $ r'   ∷ Word8
-        g  = fromIntegral . max 0 . min 255 $ g'   ∷ Word8
-        b  = fromIntegral . max 0 . min 255 $ b'   ∷ Word8
--- `applyOp` will eventually be refactored to look something like this
--- applyOp ∷ (Int → Int → Int) → PixelRGBA8 → PixelRGBA8 → PixelRGBA8
--- applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂) =
---     PixelRGBA8 r g b (max a₁ a₂)
---   where
---     [r, g, b] = map (fromIntegral . limit
---                      . uncurry op . (fromIntegral *** fromIntegral))
---                     [(r₁, r₂), (g₁, g₂), (b₁, b₂)] ∷ [Word8]
-
+  where
+    f = fromIntegral . limit . uncurry op . (fromIntegral *** fromIntegral)
+    r = f (r₁, r₂)
+    g = f (g₁, g₂)
+    b = f (b₁, b₂)
 
 --   TODO: PixelRGBA8 should not really have an instance of
 --   Num since it doesn't behave like a number. For
@@ -112,7 +103,10 @@ safeMultiply = (⊗)
 scale ∷ Double → PixelRGBA8 → PixelRGBA8
 scale n (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
   where
-    [r', g', b'] = map (round . limit . (* n) . fromIntegral) [r, g, b]
+    f = round . limit . (* n) . fromIntegral
+    r' = f r
+    g' = f g
+    b' = f b
 
 addAlphaChannel ∷ Image PixelRGB8 → Image PixelRGBA8
 addAlphaChannel = pixelMap addAlphaChannel'
@@ -121,7 +115,10 @@ addAlphaChannel = pixelMap addAlphaChannel'
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
   where changeBrightness' (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
-          where [r', g', b'] = map (⊕ amount) [r, g, b]
+          where f = (⊕ amount)
+                r' = f r
+                g' = f g
+                b' = f b
 
 changeRed ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeRed amount = pixelMap changeRed'
@@ -185,6 +182,15 @@ blur img n = let neighbors x y = catMaybes [getPixel img (x - i) (y - j)
                  w = imageWidth  img
                  h = imageHeight img
              in generateImage (\x y → average (neighbors x y)) w h
+
+-- | Contrast change as described in
+-- <http://www.dfstudios.co.uk/articles/programming/image-programming-algorithms/image-processing-algorithms-part-5-contrast-adjustment/ here>.
+changeContrast ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
+changeContrast n img = pixelMap changePixel img
+  where
+    factor = (259 * (n + 255)) `div` (255 * (259 - n))
+    f x = fromIntegral $ limit $ factor * (fromIntegral x - 128) + 128
+    changePixel (PixelRGBA8 r g b a) = PixelRGBA8 (f r) (f g) (f b) a
 
 -- | Negate the color of a given image.
 negateImage ∷ Image PixelRGBA8 → Image PixelRGBA8

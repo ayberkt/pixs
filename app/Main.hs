@@ -44,6 +44,17 @@ brightness = ArgT
     <*> outputOption
     <*> pure T.changeBrightness
 
+contrast ∷ Parser CommandType
+contrast = ArgT
+    <$> inputOption
+    <*> (A.option A.auto
+           (   A.long "magnitude"
+            <> A.short 'm'
+            <> A.metavar "MAGNITUDE"
+            <> A.help "Magnitude of contrast change"))
+    <*> outputOption
+    <*> pure T.changeContrast
+
 red ∷ Parser CommandType
 red =  ArgT
    <$> inputOption
@@ -103,6 +114,9 @@ menu = A.subparser
          $  A.command "brightness"
              (A.info brightness
                       (A.progDesc "Change brightness of given image."))
+         <> A.command "contrast"
+             (A.info contrast
+                      (A.progDesc "Change contrast of given image."))
          <> A.command "flip"
              (A.info flip
                       (A.progDesc "Flip a given image about the origin."))
