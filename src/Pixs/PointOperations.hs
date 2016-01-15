@@ -29,8 +29,8 @@ threshold n img =
       -- threshing) : farm workers started the afternoon's threshing.
       thresh x y = let (PixelRGBA8 r g b _) = pixelAt img x y
                        fs ■ xs = map (uncurry ($)) $ zip fs xs
-                       intensity = sum
-                                   $ (M.findWithDefault 0 <$> [r, g, b])
-                                   ■ [redMap, greenMap, blueMap]
+                       intensity = (sum
+                                    $ (M.findWithDefault 0 <$> [r, g, b])
+                                    ■ [redMap, greenMap, blueMap]) `div` 3
                       in if (intensity > n) then white else black
   in generateImage thresh (imageWidth img) (imageHeight img)
