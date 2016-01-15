@@ -50,7 +50,7 @@ threshold = ArgT
          <$> inputOption
          <*> magnitudeOption
          <*> outputOption
-         <*> pure PO.threshImage
+         <*> pure PO.threshold
 
 contrast ∷ Parser CommandType
 contrast = ArgT
