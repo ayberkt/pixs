@@ -37,11 +37,7 @@ magnitudeOption = (A.option A.auto
 brightness ∷ Parser CommandType
 brightness = ArgT
     <$> inputOption
-    <*> (A.option A.auto
-           (   A.long "magnitude"
-            <> A.short 'm'
-            <> A.metavar "MAGNITUDE"
-            <> A.help "Magnitude of brightness change"))
+    <*> magnitudeOption
     <*> outputOption
     <*> pure T.changeBrightness
 
