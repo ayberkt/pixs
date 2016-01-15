@@ -2,9 +2,9 @@
 {-# LANGUAGE UnicodeSyntax      #-}
 
 module Pixs.Transformation ( blur
-                           , flipVertical
-                           , flipHorizontal
-                           , flip
+                           , reflectVertical
+                           , reflectHorizontal
+                           , reflect
                            , changeRed
                            , changeGreen
                            , changeBlue
@@ -22,7 +22,6 @@ module Pixs.Transformation ( blur
                            , scale) where
 
 
-import Prelude hiding (flip)
 import Control.Arrow ((***))
 import Data.Word
 import Data.Maybe (catMaybes)
@@ -129,16 +128,18 @@ changeBlue amount = pixelMap changeBlue'
 saturation ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 saturation amount = changeRed amount . changeGreen amount . changeBlue amount
 
-flipVertical ∷ Pixel a ⇒ Image a → Image a
-flipVertical img =  generateImage complement (imageWidth img) (imageHeight img)
+reflectVertical ∷ Pixel a ⇒ Image a → Image a
+reflectVertical img =  generateImage complement w h
   where complement x y = pixelAt img x (imageHeight img - y - 1)
+        [w, h]         = [imageWidth, imageHeight] <*> pure img
 
-flipHorizontal ∷ Pixel a ⇒ Image a → Image a
-flipHorizontal img = generateImage complement (imageWidth img) (imageHeight img)
+reflectHorizontal ∷ Pixel a ⇒ Image a → Image a
+reflectHorizontal img = generateImage complement w h
   where complement x y = pixelAt img (imageWidth img - x - 1) y
+        [w, h]         = [imageWidth, imageHeight] <*> pure img
 
-flip ∷ Pixel a ⇒ Image a → Image a
-flip = flipVertical . flipHorizontal
+reflect ∷ Pixel a ⇒ Image a → Image a
+reflect = reflectVertical . reflectHorizontal
 
 -- | Take a list of pixels. Return the pixel that is the average color of
 -- those pixels.

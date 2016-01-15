@@ -8,7 +8,7 @@ import           Codec.Picture              (DynamicImage (..), Image,
 import qualified Pixs.Transformation        as T
 import qualified Pixs.Arithmetic            as Arith
 import qualified Pixs.PointOperations       as PO
-import           Prelude                    hiding (error, flip, and, or)
+import           Prelude                    hiding (error, and, or)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
@@ -84,17 +84,20 @@ blue =  ArgT
     <*> outputOption
     <*> pure T.changeBlue
 
-flip ∷ Parser CommandType
-flip = SingleT <$> inputOption <*> outputOption <*> pure T.flip
+reflect ∷ Parser CommandType
+reflect = SingleT <$> inputOption <*> outputOption <*> pure T.reflect
 
-flipVertical ∷ Parser CommandType
-flipVertical = SingleT <$> inputOption <*> outputOption <*> pure T.flipVertical
+reflectVertical ∷ Parser CommandType
+reflectVertical = SingleT
+               <$> inputOption
+               <*> outputOption
+               <*> pure T.reflectVertical
 
-flipHorizontal ∷ Parser CommandType
-flipHorizontal = SingleT
+reflectHorizontal ∷ Parser CommandType
+reflectHorizontal = SingleT
               <$> inputOption
               <*> outputOption
-              <*> pure T.flipHorizontal
+              <*> pure T.reflectHorizontal
 
 add ∷ Parser CommandType
 add = MultiT
@@ -135,15 +138,15 @@ menu = A.subparser
          <> A.command "contrast"
              (A.info contrast
                (A.progDesc "Change contrast of given image."))
-         <> A.command "flip"
-             (A.info flip
-               (A.progDesc "Flip a given image about the origin."))
-         <> A.command "flipVertical"
-             (A.info flipVertical
-               (A.progDesc "Flip a given image vertically i.e. by y = 0."))
-         <> A.command "flipHorizontal"
-              (A.info flipHorizontal
-                (A.progDesc "Flip a given image horizontally i.e. by x = 0."))
+         <> A.command "reflect"
+             (A.info reflect
+               (A.progDesc "Reflect a given image about the origin."))
+         <> A.command "reflectVertical"
+             (A.info reflectVertical
+               (A.progDesc "Reflect a given image vertically i.e. by y = 0."))
+         <> A.command "reflectHorizontal"
+              (A.info reflectHorizontal
+                (A.progDesc "Reflect a given image horizontally i.e. by x = 0."))
          <> A.command "add"
              (A.info add
                (A.progDesc "Add one or more images together."))
