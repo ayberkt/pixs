@@ -7,6 +7,8 @@ import           Codec.Picture              (DynamicImage (..), Image,
 -- import qualified Pixs.Information.Histogram as H
 import qualified Pixs.Transformation        as T
 import qualified Pixs.Arithmetic            as Arith
+import qualified Pixs.PointOperations       as PO
+import           Pixs.Types                 (Color(..))
 import           Prelude                    hiding (error, flip, and, or)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
@@ -43,6 +45,13 @@ brightness = ArgT
             <> A.help "Magnitude of brightness change"))
     <*> outputOption
     <*> pure T.changeBrightness
+
+threshold ∷ Parser CommandType
+threshold = ArgT
+         <$> inputOption
+         <*> magnitudeOption
+         <*> outputOption
+         <*> pure (PO.threshold Red)
 
 contrast ∷ Parser CommandType
 contrast = ArgT
@@ -141,6 +150,9 @@ menu = A.subparser
          <> A.command "or"
               (A.info or
                       (A.progDesc "Bitwise-or multiple images together."))
+         <> A.command "threshold"
+              (A.info threshold
+                      (A.progDesc "Threshold given image."))
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img

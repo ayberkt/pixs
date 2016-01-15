@@ -13,12 +13,8 @@ import qualified Data.Map.Strict                           as M
 import           Data.Word                                 (Word8)
 import           Graphics.Rendering.Chart.Backend.Diagrams
 import           Graphics.Rendering.Chart.Easy
+import           Pixs.Types                                (Color(..))
 import           Prelude                                   hiding (lookup)
-
-data Color = Red
-           | Green
-           | Blue
-           deriving (Show,Eq,Ord)
 
 -- | Takes in an image `img` and a @Color@ `c`. Returns a map that stores
 -- for every given Word8 value v, the total number of pixels that hold a
