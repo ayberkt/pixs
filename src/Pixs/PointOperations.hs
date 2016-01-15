@@ -27,10 +27,10 @@ threshold n img =
       -- typically with a flail or by the action of a revolving mechanism:
       -- machinery that can reap and thresh corn in the same process | (as noun
       -- threshing) : farm workers started the afternoon's threshing.
-      thresh x y                  = let (PixelRGBA8 r g b _) = pixelAt img x y
-                                        fs ■ xs = map (uncurry ($)) $ zip fs xs
-                                        intensity = sum
-                                                    $ (M.findWithDefault 0 <$> [r, g, b])
-                                                    ■ [redMap, greenMap, blueMap]
+      thresh x y = let (PixelRGBA8 r g b _) = pixelAt img x y
+                       fs ■ xs = map (uncurry ($)) $ zip fs xs
+                       intensity = sum
+                                   $ (M.findWithDefault 0 <$> [r, g, b])
+                                   ■ [redMap, greenMap, blueMap]
                       in if (intensity > n) then white else black
   in generateImage thresh (imageWidth img) (imageHeight img)
