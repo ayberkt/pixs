@@ -9,6 +9,7 @@ module Pixs.Transformation ( blur
                            , changeGreen
                            , changeBlue
                            , changeBrightness
+                           , changeContrast
                            , negateImage
                            , saturation
                            , getPixel
@@ -27,7 +28,6 @@ import Data.Word
 import Data.Maybe (catMaybes)
 import Codec.Picture( PixelRGBA8(..)
                     , Image(..)
-                    , Pixel8
                     , Pixel
                     , pixelMap
                     , imageHeight
@@ -176,6 +176,15 @@ blur img n = let neighbors x y = catMaybes [getPixel img (x - i) (y - j)
                  w = imageWidth  img
                  h = imageHeight img
              in generateImage (\x y → average (neighbors x y)) w h
+
+-- | Contrast change as described in
+-- <http://www.dfstudios.co.uk/articles/programming/image-programming-algorithms/image-processing-algorithms-part-5-contrast-adjustment/ here>.
+changeContrast ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
+changeContrast n img = pixelMap changePixel img
+  where
+    factor = (259 * (n + 255)) `div` (255 * (259 - n))
+    f x = fromIntegral $ limit $ factor * (fromIntegral x - 128) + 128
+    changePixel (PixelRGBA8 r g b a) = PixelRGBA8 (f r) (f g) (f b) a
 
 -- | Negate the color of a given image.
 negateImage ∷ Image PixelRGBA8 → Image PixelRGBA8

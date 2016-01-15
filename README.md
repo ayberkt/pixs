@@ -12,7 +12,7 @@ command-line interface to `Pixs`.
   - [x] Division
   - [x] Blending
   - [x] Logical AND/NAND
-  - [ ] Logical OR/NOR
+  - [x] Logical OR/NOR
   - [ ] Logical XOR/XNOR
   - [ ] Invert/Logical NOT
   - [ ] Bitshift operators
@@ -26,7 +26,7 @@ command-line interface to `Pixs`.
 - Color adjustments
   - [x] Brightness
   - [x] Colors
-  - [ ] Contrast
+  - [x] Contrast
 - Geometric Operations
   - [ ] Scale
   - [ ] Rotate
