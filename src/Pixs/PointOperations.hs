@@ -8,21 +8,22 @@ import            Codec.Picture              (Image, PixelRGBA8(..),
                                              imageWidth, imageHeight)
 import            Pixs.Types                 (Color(..))
 import qualified  Data.Map                   as M
-import            Data.Word                  ()
 
-threshold ∷ Color
-          → Int
+threshImage ∷ Int
           → Image PixelRGBA8
           → Image PixelRGBA8
-threshold c trsh img =
-  let black         = PixelRGBA8 0    0    0    0xFF
-      white         = PixelRGBA8 0xFF 0xFF 0xFF 0XFF
-      colorMap      = colorCount img c
-      foo x y       = let (PixelRGBA8 r g b _) = pixelAt img x y
-                          value = case c of Red   → r
-                                            Green → g
-                                            Blue  → b
-                      in if (M.findWithDefault 0 value colorMap > trsh)
-                         then white
-                         else black
-  in generateImage foo (imageWidth img) (imageHeight img)
+threshImage trsh img =
+  let black                       = PixelRGBA8 0    0    0    0xFF
+      white                       = PixelRGBA8 0xFF 0xFF 0xFF 0XFF
+      [redMap, greenMap, blueMap] = colorCount img <$> [Red, Green, Blue]
+      -- Dictionary meaning of "to thresh": separate grain from (a plant),
+      -- typically with a flail or by the action of a revolving mechanism:
+      -- machinery that can reap and thresh corn in the same process | (as noun
+      -- threshing) : farm workers started the afternoon's threshing.
+      thresh x y                  = let (PixelRGBA8 r g b _) = pixelAt img x y
+                                        fs ■ xs = map (uncurry ($)) $ zip fs xs
+                                        intensity = sum
+                                                    $ (M.findWithDefault 0 <$> [r, g, b])
+                                                    ■ [redMap, greenMap, blueMap]
+                      in if (intensity > trsh) then white else black
+  in generateImage thresh (imageWidth img) (imageHeight img)

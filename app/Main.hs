@@ -8,7 +8,6 @@ import           Codec.Picture              (DynamicImage (..), Image,
 import qualified Pixs.Transformation        as T
 import qualified Pixs.Arithmetic            as Arith
 import qualified Pixs.PointOperations       as PO
-import           Pixs.Types                 (Color(..))
 import           Prelude                    hiding (error, flip, and, or)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
@@ -51,7 +50,7 @@ threshold = ArgT
          <$> inputOption
          <*> magnitudeOption
          <*> outputOption
-         <*> pure (PO.threshold Red)
+         <*> pure PO.threshImage
 
 contrast ∷ Parser CommandType
 contrast = ArgT
