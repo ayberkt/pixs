@@ -90,6 +90,12 @@ flip = SingleT <$> inputOption <*> outputOption <*> pure T.flip
 flipVertical ∷ Parser CommandType
 flipVertical = SingleT <$> inputOption <*> outputOption <*> pure T.flipVertical
 
+flipHorizontal ∷ Parser CommandType
+flipHorizontal = SingleT
+              <$> inputOption
+              <*> outputOption
+              <*> pure T.flipHorizontal
+
 add ∷ Parser CommandType
 add = MultiT
     <$> (A.many $ A.strOption
@@ -134,7 +140,10 @@ menu = A.subparser
                (A.progDesc "Flip a given image about the origin."))
          <> A.command "flipVertical"
              (A.info flipVertical
-               (A.progDesc "Flip a given image vertically."))
+               (A.progDesc "Flip a given image vertically i.e. by y = 0."))
+         <> A.command "flipHorizontal"
+              (A.info flipHorizontal
+                (A.progDesc "Flip a given image horizontally i.e. by x = 0."))
          <> A.command "add"
              (A.info add
                (A.progDesc "Add one or more images together."))
