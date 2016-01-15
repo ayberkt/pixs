@@ -15,7 +15,7 @@ threshold ∷ Color
           → Image PixelRGBA8
           → Image PixelRGBA8
 threshold c trsh img =
-  let black         = PixelRGBA8 0    0    0    0
+  let black         = PixelRGBA8 0    0    0    0xFF
       white         = PixelRGBA8 0xFF 0xFF 0xFF 0XFF
       colorMap      = colorCount img c
       foo x y       = let (PixelRGBA8 r g b _) = pixelAt img x y
