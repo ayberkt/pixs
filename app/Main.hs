@@ -144,7 +144,7 @@ menu = A.subparser
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img
-unwrapImage (ImageRGB8 img)  = Just (T.addAlphaChannel img)
+unwrapImage (ImageRGB8 img)  = Just $ T.addAlphaChannel img
 unwrapImage _                = Nothing
 
 run ∷ CommandType → IO ()
@@ -153,6 +153,7 @@ run (SingleT inFile outFile f) = do
   case imageLoad of
     Left  error → putStrLn error
     Right image → case image of
+      ImageRGB8 img → writePng outFile . f $ T.addAlphaChannel img
       ImageRGBA8 img → writePng outFile $ f img
       _              → putStrLn "Type not handled yet."
 run (MultiT imgPaths outFile f) = do
@@ -168,6 +169,7 @@ run (ArgT inFile n outFile f) = do
   case imageLoad of
     Left error  → putStrLn error
     Right image → case image of
+      ImageRGB8 img → writePng outFile $ f n $ T.addAlphaChannel img
       ImageRGBA8 img → writePng outFile $ f n img
       _              → putStrLn "Type not handled yet."
 
