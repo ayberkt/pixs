@@ -117,41 +117,45 @@ or = MultiT
     <*> outputOption
     <*> pure (foldl1 Arith.or)
 
+-- TODO: IMPLEMENT!
+histogram ∷ Parser CommandType
+histogram = undefined
+
 menu ∷ Parser CommandType
 menu = A.subparser
          $  A.command "brightness"
              (A.info brightness
-                      (A.progDesc "Change brightness of given image."))
+               (A.progDesc "Change brightness of given image."))
          <> A.command "contrast"
              (A.info contrast
-                      (A.progDesc "Change contrast of given image."))
+               (A.progDesc "Change contrast of given image."))
          <> A.command "flip"
              (A.info flip
-                      (A.progDesc "Flip a given image about the origin."))
+               (A.progDesc "Flip a given image about the origin."))
          <> A.command "flipVertical"
              (A.info flipVertical
-                     (A.progDesc "Flip a given image vertically."))
+               (A.progDesc "Flip a given image vertically."))
          <> A.command "add"
              (A.info add
-                     (A.progDesc "Add one or more images together."))
+               (A.progDesc "Add one or more images together."))
          <> A.command "red"
              (A.info red
-                     (A.progDesc "Change the red component of a given image."))
+               (A.progDesc "Change the red component of a given image."))
          <> A.command "blue"
              (A.info blue
-                     (A.progDesc "Change the blue component of a given image."))
+               (A.progDesc "Change the blue component of a given image."))
          <> A.command "green"
               (A.info green
-                      (A.progDesc "Change the green component of a given image."))
+                (A.progDesc "Change the green component of a given image."))
          <> A.command "and"
               (A.info and
-                      (A.progDesc "Bitwise-and multiple images together."))
+                (A.progDesc "Bitwise-and multiple images together."))
          <> A.command "or"
               (A.info or
-                      (A.progDesc "Bitwise-or multiple images together."))
+                (A.progDesc "Bitwise-or multiple images together."))
          <> A.command "threshold"
               (A.info threshold
-                      (A.progDesc "Threshold given image."))
+                (A.progDesc "Threshold given image."))
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img
