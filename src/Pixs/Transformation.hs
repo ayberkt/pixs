@@ -110,9 +110,7 @@ changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
   where changeBrightness' (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
           where f = (⊕ amount)
-                r' = f r
-                g' = f g
-                b' = f b
+                [r', g', b'] = f <$> [r, g, b]
 
 changeRed ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeRed amount = pixelMap changeRed'
