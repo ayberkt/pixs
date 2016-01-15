@@ -12,7 +12,7 @@ import qualified  Data.Map                   as M
 threshImage ∷ Int
           → Image PixelRGBA8
           → Image PixelRGBA8
-threshImage trsh img =
+threshImage threshold img =
   let black                       = PixelRGBA8 0    0    0    0xFF
       white                       = PixelRGBA8 0xFF 0xFF 0xFF 0XFF
       [redMap, greenMap, blueMap] = colorCount img <$> [Red, Green, Blue]
@@ -25,5 +25,5 @@ threshImage trsh img =
                                         intensity = sum
                                                     $ (M.findWithDefault 0 <$> [r, g, b])
                                                     ■ [redMap, greenMap, blueMap]
-                      in if (intensity > trsh) then white else black
+                      in if (intensity > threshold) then white else black
   in generateImage thresh (imageWidth img) (imageHeight img)
