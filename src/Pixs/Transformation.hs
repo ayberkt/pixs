@@ -35,6 +35,7 @@ import Codec.Picture( PixelRGBA8(..)
                     , imageWidth
                     , pixelAt
                     , generateImage)
+import Pixs.Types (Color(..))
 
 limit ∷ (Num c, Ord c) ⇒ c → c
 limit = max 0 . min 255
@@ -118,18 +119,21 @@ changeBrightness amount = pixelMap changeBrightness'
                 [r', g', b'] = f <$> [r, g, b]
 
 changeRed ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
-changeRed amount = pixelMap changeRed'
-  where changeRed' (PixelRGBA8 r g b a) = PixelRGBA8 (r ⊕ amount) g b a
+changeRed = changeColor Red
 
 changeGreen ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
-changeGreen amount = pixelMap changeGreen'
-  where changeGreen' (PixelRGBA8 r g b a) = PixelRGBA8 r g' b a
-                                            where g' = g ⊕ amount
+changeGreen = changeColor Green
 
 changeBlue ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
-changeBlue amount = pixelMap changeBlue'
-  where changeBlue' (PixelRGBA8 r g b a) = PixelRGBA8 r g b' a
-                                            where b' = b ⊕ amount
+changeBlue = changeColor Blue
+
+changeColor ∷ Color → Int → Image PixelRGBA8 → Image PixelRGBA8
+changeColor c amount = pixelMap changeColor'
+  where changeColor' (PixelRGBA8 r g b a) =
+          case c of
+            Red   → let r' = r ⊗ amount in PixelRGBA8 r' g  b  a
+            Green → let g' = g ⊗ amount in PixelRGBA8 r  g' b  a
+            Blue  → let b' = b ⊗ amount in PixelRGBA8 r  g  b' a
 
 saturation ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 saturation amount = changeRed amount . changeGreen amount . changeBlue amount
