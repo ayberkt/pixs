@@ -1,4 +1,4 @@
-# pixs [![Build Status](https://travis-ci.org/ayberkt/pixs.svg?branch=master)](https://travis-ci.com/ayberkt/pixs)
+# pixs [![Build Status](https://travis-ci.org/ayberkt/pixs.svg?branch=master)](https://travis-ci.org/ayberkt/pixs)
 
 `Pixs` is an image processing library written entirely in Haskell. `pixs` is a
 command-line interface to `Pixs`.
