@@ -27,6 +27,8 @@ command-line interface to `Pixs`.
   - [x] Brightness
   - [x] Colors
   - [x] Contrast
+  - [ ] Shadows
+  - [ ] Fade
 - Geometric Operations
   - [ ] Scale
   - [ ] Rotate
