@@ -11,7 +11,7 @@ import qualified  Data.Map                   as M
 
 -- | Thresholds an image by pixel intensity. We define the intensity of a given
 -- pixel (PixelRGBA8 r g b a)¹ to be the sum of the number of pixels with the
--- components r, g, b, and a. @threshImage@ sifts out all pixels that have
+-- components r, g, b, and a. @threshold@ sifts out all pixels that have
 -- intensity greater than the given threshold `n`. This is useful for things
 -- like separating the backfground from the foreground. A complete explanation
 -- of thresholding is given at:
