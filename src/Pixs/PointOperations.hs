@@ -17,6 +17,8 @@ import qualified  Data.Map                   as M
 -- of thresholding is given at:
 -- http://homepages.inf.ed.ac.uk/rbf/HIPR2/threshld.htm
 --
+-- <<docs/example.png>> <<docs/example-thresholded.png>>
+--
 -- ¹: If that's not clear, I'm doing destructuring in the English language.
 threshold ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 threshold n img =
