@@ -1,4 +1,4 @@
-{-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE UnicodeSyntax, GADTs, ExistentialQuantification #-}
 
 import           Data.Either                (partitionEithers)
 import           Codec.Picture              (DynamicImage (..), Image,
@@ -11,10 +11,13 @@ import           Prelude                    hiding (error, flip, and, or)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
-data CommandType =
-    SingleT FilePath   FilePath          (Image PixelRGBA8 → Image PixelRGBA8)
-  | MultiT  [FilePath] FilePath          ([Image PixelRGBA8] → Image PixelRGBA8)
-  | ArgT    FilePath   Int      FilePath (Int → Image PixelRGBA8 → Image PixelRGBA8)
+data CommandType where
+  SingleT ∷ FilePath → FilePath → (Image PixelRGBA8 → Image PixelRGBA8) → CommandType
+  MultiT ∷ [FilePath] → FilePath → ([Image PixelRGBA8] → Image PixelRGBA8) → CommandType
+  ArgT ∷ forall a. Read a ⇒ FilePath → a → FilePath → (a → Image PixelRGBA8 → Image PixelRGBA8) → CommandType
+
+data FlipDirection = Origin | Horizontal | Vertical
+  deriving (Read, Show, Eq)
 
 inputOption ∷ Parser FilePath
 inputOption = A.strOption (   A.long "in"
@@ -77,10 +80,19 @@ blue =  ArgT
     <*> pure T.changeBlue
 
 flip ∷ Parser CommandType
-flip = SingleT <$> inputOption <*> outputOption <*> pure T.flip
-
-flipVertical ∷ Parser CommandType
-flipVertical = SingleT <$> inputOption <*> outputOption <*> pure T.flipVertical
+flip = ArgT
+    <$> inputOption
+    <*> (A.option A.auto
+           (   A.long "direction"
+            <> A.short 'd'
+            <> A.metavar "DIRECTION"
+            <> A.help "Direction of flip"))
+    <*> outputOption
+    <*> pure flipDir
+  where
+    flipDir Horizontal = T.flipHorizontal
+    flipDir Vertical   = T.flipVertical
+    flipDir Origin     = T.flip
 
 add ∷ Parser CommandType
 add = MultiT
@@ -119,10 +131,7 @@ menu = A.subparser
                       (A.progDesc "Change contrast of given image."))
          <> A.command "flip"
              (A.info flip
-                      (A.progDesc "Flip a given image about the origin."))
-         <> A.command "flipVertical"
-             (A.info flipVertical
-                     (A.progDesc "Flip a given image vertically."))
+                      (A.progDesc "Flip a given image."))
          <> A.command "add"
              (A.info add
                      (A.progDesc "Add one or more images together."))
