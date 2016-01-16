@@ -17,7 +17,7 @@ command-line interface to `Pixs`.
   - [ ] Invert/Logical NOT
   - [ ] Bitshift operators
 - Point operations
-  - [ ] Thresholding
+  - [x] Thresholding
   - [ ] Adaptive thresholding
   - [ ] Contrast stretching
   - [ ] Histogram equalzation
