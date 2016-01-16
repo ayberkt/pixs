@@ -1,5 +1,4 @@
-*.png
-*.svg
+data/
 .cabal-sandbox/
 *.sh
 *.config
