@@ -31,5 +31,5 @@ threshold n img =
                        (■) = zipWith id
                        intensity = (sum $ (M.findWithDefault 0 <$> [r, g, b])
                                     ■ [redMap, greenMap, blueMap]) `div` 3
-                      in if (intensity > n) then white else black
+                      in if (intensity > n) then black else white
   in generateImage thresh (imageWidth img) (imageHeight img)
