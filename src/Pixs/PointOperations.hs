@@ -28,9 +28,8 @@ threshold n img =
       -- machinery that can reap and thresh corn in the same process | (as noun
       -- threshing) : farm workers started the afternoon's threshing.
       thresh x y = let (PixelRGBA8 r g b _) = pixelAt img x y
-                       fs ■ xs = map (uncurry ($)) $ zip fs xs
-                       intensity = (sum
-                                    $ (M.findWithDefault 0 <$> [r, g, b])
+                       (■) = zipWith id
+                       intensity = (sum $ (M.findWithDefault 0 <$> [r, g, b])
                                     ■ [redMap, greenMap, blueMap]) `div` 3
                       in if (intensity > n) then white else black
   in generateImage thresh (imageWidth img) (imageHeight img)
