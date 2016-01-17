@@ -13,12 +13,8 @@ import qualified Data.Map.Strict                           as M
 import           Data.Word                                 (Word8)
 import           Graphics.Rendering.Chart.Backend.Diagrams
 import           Graphics.Rendering.Chart.Easy
+import           Pixs.Types                                (Color(..))
 import           Prelude                                   hiding (lookup)
-
-data Color = Red
-           | Green
-           | Blue
-           deriving (Show,Eq,Ord)
 
 -- | Takes in an image `img` and a @Color@ `c`. Returns a map that stores
 -- for every given Word8 value v, the total number of pixels that hold a
@@ -49,14 +45,14 @@ fill color vs = liftEC $ do
   plot_fillbetween_values .= vs
 
 -- | Create the histogram and save it to a file.
-makeHistogram ∷ Image PixelRGBA8 → IO ()
-makeHistogram img = let toDouble ∷ Integral α ⇒ (α,β) → (Double,β)
-                        toDouble (x,y) = (fromIntegral x,y)
-                        [rCount,gCount,bCount] =   map toDouble
-                                                 . M.toList
-                                                 . colorCount img
-                                                 <$> [Red, Green, Blue]
-                    in toFile def "example.svg" $ do
+makeHistogram ∷ Image PixelRGBA8 → FilePath → IO ()
+makeHistogram img out = let toDouble ∷ Integral α ⇒ (α,β) → (Double,β)
+                            toDouble (x,y) = (fromIntegral x,y)
+                            [rCount,gCount,bCount] = map toDouble
+                                                     . M.toList
+                                                     . colorCount img
+                                                     <$> [Red, Green, Blue]
+                    in toFile def out $ do
                          layout_title .= "Color histogram"
                          layout_title_style . font_size .= 15
                          plot (fill red   [(d, (0, v))

@@ -1,4 +1,4 @@
-# pixs [![Build Status](https://travis-ci.org/ayberkt/pixs.svg?branch=master)](https://travis-ci.com/ayberkt/pixs)
+# pixs [![Build Status](https://travis-ci.org/ayberkt/pixs.svg?branch=master)](https://travis-ci.org/ayberkt/pixs)
 
 `Pixs` is an image processing library written entirely in Haskell. `pixs` is a
 command-line interface to `Pixs`.
@@ -17,7 +17,7 @@ command-line interface to `Pixs`.
   - [ ] Invert/Logical NOT
   - [ ] Bitshift operators
 - Point operations
-  - [ ] Thresholding
+  - [x] Thresholding
   - [ ] Adaptive thresholding
   - [ ] Contrast stretching
   - [ ] Histogram equalzation
@@ -27,6 +27,8 @@ command-line interface to `Pixs`.
   - [x] Brightness
   - [x] Colors
   - [x] Contrast
+  - [ ] Shadows
+  - [ ] Fade
 - Geometric Operations
   - [ ] Scale
   - [ ] Rotate

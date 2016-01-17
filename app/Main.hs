@@ -7,7 +7,8 @@ import           Codec.Picture              (DynamicImage (..), Image,
 -- import qualified Pixs.Information.Histogram as H
 import qualified Pixs.Transformation        as T
 import qualified Pixs.Arithmetic            as Arith
-import           Prelude                    hiding (error, flip, and, or)
+import qualified Pixs.PointOperations       as PO
+import           Prelude                    hiding (error, and, or)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
@@ -16,7 +17,7 @@ data CommandType where
   MultiT ∷ [FilePath] → FilePath → ([Image PixelRGBA8] → Image PixelRGBA8) → CommandType
   ArgT ∷ forall a. Read a ⇒ FilePath → a → FilePath → (a → Image PixelRGBA8 → Image PixelRGBA8) → CommandType
 
-data FlipDirection = Origin | Horizontal | Vertical
+data ReflectDirection = Origin | Horizontal | Vertical
   deriving (Read, Show, Eq)
 
 inputOption ∷ Parser FilePath
@@ -39,13 +40,16 @@ magnitudeOption = (A.option A.auto
 brightness ∷ Parser CommandType
 brightness = ArgT
     <$> inputOption
-    <*> (A.option A.auto
-           (   A.long "magnitude"
-            <> A.short 'm'
-            <> A.metavar "MAGNITUDE"
-            <> A.help "Magnitude of brightness change"))
+    <*> magnitudeOption
     <*> outputOption
     <*> pure T.changeBrightness
+
+threshold ∷ Parser CommandType
+threshold = ArgT
+         <$> inputOption
+         <*> magnitudeOption
+         <*> outputOption
+         <*> pure PO.threshold
 
 contrast ∷ Parser CommandType
 contrast = ArgT
@@ -79,20 +83,20 @@ blue =  ArgT
     <*> outputOption
     <*> pure T.changeBlue
 
-flip ∷ Parser CommandType
-flip = ArgT
+reflect ∷ Parser CommandType
+reflect = ArgT
     <$> inputOption
     <*> (A.option A.auto
            (   A.long "direction"
             <> A.short 'd'
             <> A.metavar "DIRECTION"
-            <> A.help "Direction of flip"))
+            <> A.help "Direction of reflect"))
     <*> outputOption
-    <*> pure flipDir
+    <*> pure reflectDir
   where
-    flipDir Horizontal = T.flipHorizontal
-    flipDir Vertical   = T.flipVertical
-    flipDir Origin     = T.flip
+    reflectDir Horizontal = T.reflectHorizontal
+    reflectDir Vertical   = T.reflectVertical
+    reflectDir Origin     = T.reflect
 
 add ∷ Parser CommandType
 add = MultiT
@@ -121,38 +125,46 @@ or = MultiT
     <*> outputOption
     <*> pure (foldl1 Arith.or)
 
+-- TODO: IMPLEMENT!
+histogram ∷ Parser CommandType
+histogram = undefined
+
 menu ∷ Parser CommandType
 menu = A.subparser
          $  A.command "brightness"
              (A.info brightness
-                      (A.progDesc "Change brightness of given image."))
+               (A.progDesc "Change brightness of given image."))
          <> A.command "contrast"
              (A.info contrast
-                      (A.progDesc "Change contrast of given image."))
-         <> A.command "flip"
-             (A.info flip
-                      (A.progDesc "Flip a given image."))
+               (A.progDesc "Change contrast of given image."))
+         <> A.command "reflect"
+             (A.info reflect
+                      (A.progDesc "Reflect a given image."))
          <> A.command "add"
              (A.info add
-                     (A.progDesc "Add one or more images together."))
+               (A.progDesc "Add one or more images together."))
          <> A.command "red"
              (A.info red
-                     (A.progDesc "Change the red component of a given image."))
+               (A.progDesc "Change the red component of a given image."))
          <> A.command "blue"
              (A.info blue
-                     (A.progDesc "Change the blue component of a given image."))
+               (A.progDesc "Change the blue component of a given image."))
          <> A.command "green"
               (A.info green
-                      (A.progDesc "Change the green component of a given image."))
+                (A.progDesc "Change the green component of a given image."))
          <> A.command "and"
               (A.info and
-                      (A.progDesc "Bitwise-and multiple images together."))
+                (A.progDesc "Bitwise-and multiple images together."))
          <> A.command "or"
               (A.info or
-                      (A.progDesc "Bitwise-or multiple images together."))
+                (A.progDesc "Bitwise-or multiple images together."))
+         <> A.command "threshold"
+              (A.info threshold
+                (A.progDesc "Threshold given image."))
 
 unwrapImage ∷ DynamicImage → Maybe (Image PixelRGBA8)
 unwrapImage (ImageRGBA8 img) = Just img
+unwrapImage (ImageRGB8 img)  = Just $ T.addAlphaChannel img
 unwrapImage _                = Nothing
 
 run ∷ CommandType → IO ()
@@ -161,6 +173,7 @@ run (SingleT inFile outFile f) = do
   case imageLoad of
     Left  error → putStrLn error
     Right image → case image of
+      ImageRGB8 img → writePng outFile . f $ T.addAlphaChannel img
       ImageRGBA8 img → writePng outFile $ f img
       _              → putStrLn "Type not handled yet."
 run (MultiT imgPaths outFile f) = do
@@ -176,6 +189,7 @@ run (ArgT inFile n outFile f) = do
   case imageLoad of
     Left error  → putStrLn error
     Right image → case image of
+      ImageRGB8 img → writePng outFile $ f n $ T.addAlphaChannel img
       ImageRGBA8 img → writePng outFile $ f n img
       _              → putStrLn "Type not handled yet."
 

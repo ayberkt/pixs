@@ -13,14 +13,17 @@ copyright:           2015, Ayberk Tosun
 category:            Graphics
 build-type:          Simple
 cabal-version:       >=1.10
+extra-doc-files:     docs/*.png
 
 library
   hs-source-dirs:      src
   exposed-modules:     Pixs
+                     , Pixs.Types
                      , Pixs.Arithmetic
                      , Pixs.Transformation
                      , Pixs.Filter
                      , Pixs.Information.Histogram
+                     , Pixs.PointOperations
   build-depends:       base <= 4.9
                      , JuicyPixels >= 3.2
                      , containers >= 0.5.6

@@ -2,12 +2,13 @@
 {-# LANGUAGE UnicodeSyntax      #-}
 
 module Pixs.Transformation ( blur
-                           , flipVertical
-                           , flipHorizontal
-                           , flip
+                           , reflectVertical
+                           , reflectHorizontal
+                           , reflect
                            , changeRed
                            , changeGreen
                            , changeBlue
+                           , addAlphaChannel
                            , changeBrightness
                            , changeContrast
                            , negateImage
@@ -22,11 +23,11 @@ module Pixs.Transformation ( blur
                            , scale) where
 
 
-import Prelude hiding (flip)
 import Control.Arrow ((***))
 import Data.Word
 import Data.Maybe (catMaybes)
 import Codec.Picture( PixelRGBA8(..)
+                    , PixelRGB8(..)
                     , Image(..)
                     , Pixel
                     , pixelMap
@@ -34,6 +35,7 @@ import Codec.Picture( PixelRGBA8(..)
                     , imageWidth
                     , pixelAt
                     , generateImage)
+import Pixs.Types (Color(..))
 
 limit ∷ (Num c, Ord c) ⇒ c → c
 limit = max 0 . min 255
@@ -106,41 +108,48 @@ scale n (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
     g' = f g
     b' = f b
 
+addAlphaChannel ∷ Image PixelRGB8 → Image PixelRGBA8
+addAlphaChannel = pixelMap addAlphaChannel'
+    where addAlphaChannel' (PixelRGB8 r g b) = PixelRGBA8 r g b 0xFF
+
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
   where changeBrightness' (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
           where f = (⊕ amount)
-                r' = f r
-                g' = f g
-                b' = f b
+                [r', g', b'] = f <$> [r, g, b]
 
 changeRed ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
-changeRed amount = pixelMap changeRed'
-  where changeRed' (PixelRGBA8 r g b a) = PixelRGBA8 (r ⊕ amount) g b a
+changeRed = changeColor Red
 
 changeGreen ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
-changeGreen amount = pixelMap changeGreen'
-  where changeGreen' (PixelRGBA8 r g b a) = PixelRGBA8 r g' b a
-                                            where g' = g ⊕ amount
+changeGreen = changeColor Green
 
 changeBlue ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
-changeBlue amount = pixelMap changeBlue'
-  where changeBlue' (PixelRGBA8 r g b a) = PixelRGBA8 r g b' a
-                                            where b' = b ⊕ amount
+changeBlue = changeColor Blue
+
+changeColor ∷ Color → Int → Image PixelRGBA8 → Image PixelRGBA8
+changeColor c amount = pixelMap changeColor'
+  where changeColor' (PixelRGBA8 r g b a) =
+          case c of
+            Red   → let r' = r ⊗ amount in PixelRGBA8 r' g  b  a
+            Green → let g' = g ⊗ amount in PixelRGBA8 r  g' b  a
+            Blue  → let b' = b ⊗ amount in PixelRGBA8 r  g  b' a
 
 saturation ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 saturation amount = changeRed amount . changeGreen amount . changeBlue amount
 
-flipVertical ∷ Pixel a ⇒ Image a → Image a
-flipVertical img =  generateImage complement (imageWidth img) (imageHeight img)
+reflectVertical ∷ Pixel a ⇒ Image a → Image a
+reflectVertical img =  generateImage complement w h
   where complement x y = pixelAt img x (imageHeight img - y - 1)
+        [w, h]         = [imageWidth, imageHeight] <*> pure img
 
-flipHorizontal ∷ Pixel a ⇒ Image a → Image a
-flipHorizontal img = generateImage complement (imageWidth img) (imageHeight img)
+reflectHorizontal ∷ Pixel a ⇒ Image a → Image a
+reflectHorizontal img = generateImage complement w h
   where complement x y = pixelAt img (imageWidth img - x - 1) y
+        [w, h]         = [imageWidth, imageHeight] <*> pure img
 
-flip ∷ Pixel a ⇒ Image a → Image a
-flip = flipVertical . flipHorizontal
+reflect ∷ Pixel a ⇒ Image a → Image a
+reflect = reflectVertical . reflectHorizontal
 
 -- | Take a list of pixels. Return the pixel that is the average color of
 -- those pixels.

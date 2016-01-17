@@ -53,9 +53,9 @@ deriving instance Show (Image PixelRGBA8)
 prop_reflexivity ∷ Image PixelRGBA8 → Bool
 prop_reflexivity img = img == img
 
-prop_double_flip_ID ∷ Image PixelRGBA8 → Bool
-prop_double_flip_ID img = if imageWidth img >= 0 && imageHeight img >= 0
-                          then T.flipVertical (T.flipVertical  img) == img
+prop_double_reflect_ID ∷ Image PixelRGBA8 → Bool
+prop_double_reflect_ID img = if imageWidth img >= 0 && imageHeight img >= 0
+                          then T.reflectVertical (T.reflectVertical  img) == img
                           else True
 
 double_apply_ID ∷ (Image PixelRGBA8 -> Image PixelRGBA8)
@@ -127,15 +127,15 @@ main = hspec $ do
   describe "Image equality" $ do
     it "is reflexive" $ property
       prop_reflexivity
-  describe "flipVertical" $ do
+  describe "reflectVertical" $ do
     it "gives identity when applied twice" $ property $
-      double_apply_ID T.flipVertical
-  describe "flipHorizontal" $ do
+      double_apply_ID T.reflectVertical
+  describe "reflectHorizontal" $ do
     it "gives identity when applied twice" $ property $
-      double_apply_ID T.flipHorizontal
-  describe "flip" $ do
+      double_apply_ID T.reflectHorizontal
+  describe "reflect" $ do
     it "gives identity when applied twice" $ property $
-      double_apply_ID T.flip
+      double_apply_ID T.reflect
   describe "Pixel addition" $ do
     it "is commutative" $ property $
       prop_pixel_comm (+)
