@@ -18,7 +18,14 @@ data CommandType where
   ArgT ∷ forall a. Read a ⇒ FilePath → a → FilePath → (a → Image PixelRGBA8 → Image PixelRGBA8) → CommandType
 
 data ReflectDirection = Origin | Horizontal | Vertical
-  deriving (Read, Show, Eq)
+  deriving (Show, Eq)
+
+-- | Aliases for ReflectDirection.
+instance Read ReflectDirection where
+  readsPrec _ s | s `elem` ["h", "horizontal"] = [(Horizontal, [])]
+                | s `elem` ["v", "vertical"]   = [(Vertical, [])]
+                | s `elem` ["o", "origin"]     = [(Origin, [])]
+                | otherwise                    = []
 
 inputOption ∷ Parser FilePath
 inputOption = A.strOption (   A.long "in"
