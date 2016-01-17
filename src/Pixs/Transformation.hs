@@ -87,6 +87,7 @@ pixelDiv = applyOp div
 (⊕) x y = let x' = fromIntegral x ∷ Int
           in fromIntegral . limit $ x' + y
 
+-- | ASCII alias for flow-checked addition.
 safeAdd ∷ Word8 → Int → Word8
 safeAdd = (⊕)
 
@@ -96,6 +97,7 @@ safeAdd = (⊕)
 (⊗) x y = let x' = (fromIntegral x) ∷ Int
           in fromIntegral . limit $ x' * y
 
+-- | ASCII alias for flow-checked multiplication.
 safeMultiply ∷ Word8 → Int → Word8
 safeMultiply = (⊗)
 
@@ -188,6 +190,8 @@ blur img n = let neighbors x y = catMaybes [getPixel img (x - i) (y - j)
 
 -- | Contrast change as described in
 -- <http://www.dfstudios.co.uk/articles/programming/image-programming-algorithms/image-processing-algorithms-part-5-contrast-adjustment/ here>.
+-- 
+-- <<docs/example.png>> <<docs/example-contrast.png>>
 changeContrast ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeContrast n img = pixelMap changePixel img
   where
