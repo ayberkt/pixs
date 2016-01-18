@@ -189,8 +189,8 @@ blur img n = let neighbors x y = catMaybes [getPixel img (x - i) (y - j)
              in generateImage (\x y → average (neighbors x y)) w h
 
 -- | Contrast change as described in
--- <http://www.dfstudios.co.uk/articles/programming/image-programming-algorithms/image-processing-algorithms-part-5-contrast-adjustment/ here>.
--- 
+-- <http://goo.gl/BTI5Ka here>.
+--
 -- <<docs/example.png>> <<docs/example-contrast.png>>
 changeContrast ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeContrast n img = pixelMap changePixel img
