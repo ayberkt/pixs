@@ -14,11 +14,14 @@ import           Codec.Picture          ( PixelRGBA8(..)
 import           Pixs.Transformation    ()
 import           Pixs.Transformation    (pixelDiv, scale)
 import           Data.Bits              ((.&.), (.|.))
+import qualified Data.Bits              as Bits
 import           Prelude   hiding       (sum)
 
 -- | Takes as input two identically sized images @img₁@ and @img₂@, and produces
 -- a new image by summing each pixel of @img₁@ with the corresponding pixel
 -- from @img₂@.
+--
+-- <<docs/example.png>> <<docs/dog.png>> <<docs/dog-butterfly-add.png>>
 add ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
 add img₁ img₂ = let sum x y = (pixelAt img₁ x y) + (pixelAt img₂ x y)
                 in generateImage sum (imageWidth img₁) (imageHeight img₁)
@@ -56,14 +59,22 @@ bitwiseImageOp op img₁ img₂ =
 
 -- | Create a new image by and'ing (i.e., @(.&.)@ from @Data.Bits@) each color
 -- component of every two corresponding pixel from @img₁@ and @img₂@.
+--
+-- <<docs/example.png img₁>> <<docs/dog.png img₂>> <<docs/dog-butterfly-and.png>>
 and ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
 and = bitwiseImageOp (.&.)
 
 -- | Create a new image by or'ing (i.e., @(.|.)@ from @Data.Bits@) each color
 -- component of every two corresponding pixel from @img₁@ and @img₂@.
+--
+-- <<docs/example.png>> <<docs/dog.png>> <<docs/dog-butterfly-or.png>>
 or ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
 or = bitwiseImageOp (.|.)
 
+-- | Create a new image by xor'ing (i.e., @xor@ from @Data.Bits@) each color
+-- component of every two corresponding pixel from @img₁@ and @img₂@.
+xor ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
+xor = bitwiseImageOp Bits.xor
 
 -- TODO
 -- invert ∷ Image PixelRGBA8 → Image PixelRGBA8
