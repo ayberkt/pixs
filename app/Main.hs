@@ -13,9 +13,20 @@ import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
 data CommandType where
-  SingleT ∷ FilePath → FilePath → (Image PixelRGBA8 → Image PixelRGBA8) → CommandType
-  MultiT ∷ [FilePath] → FilePath → ([Image PixelRGBA8] → Image PixelRGBA8) → CommandType
-  ArgT ∷ forall a. Read a ⇒ FilePath → a → FilePath → (a → Image PixelRGBA8 → Image PixelRGBA8) → CommandType
+  SingleT ∷ FilePath
+          → FilePath
+          → (Image PixelRGBA8 → Image PixelRGBA8)
+          → CommandType
+  MultiT ∷ [FilePath]
+         → FilePath
+         → ([Image PixelRGBA8] → Image PixelRGBA8)
+         → CommandType
+  ArgT ∷ forall a. Read a
+       ⇒ FilePath
+       → a
+       → FilePath
+       → (a → Image PixelRGBA8 → Image PixelRGBA8)
+       → CommandType
 
 data ReflectDirection = Origin | Horizontal | Vertical
   deriving (Show, Eq)
