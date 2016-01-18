@@ -1,6 +1,6 @@
 {-# LANGUAGE UnicodeSyntax #-}
 
-module Pixs.Arithmetic where
+module Pixs.Operations.Image where
 
 import           Codec.Picture          ( PixelRGBA8(..)
                                         , Pixel8
@@ -11,7 +11,7 @@ import           Codec.Picture          ( PixelRGBA8(..)
                                         , pixelAt
                                         , generateImage)
 
-import           Pixs.Transformation()
+import           Pixs.Transformation    ()
 import           Pixs.Transformation    (pixelDiv, scale)
 import           Data.Bits              ((.&.), (.|.))
 import           Prelude   hiding       (sum)
@@ -63,6 +63,7 @@ and = bitwiseImageOp (.&.)
 -- component of every two corresponding pixel from @img₁@ and @img₂@.
 or ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
 or = bitwiseImageOp (.|.)
+
 
 -- TODO
 -- invert ∷ Image PixelRGBA8 → Image PixelRGBA8

@@ -5,16 +5,16 @@
 
 module Main where
 
-import Test.Hspec
-import Test.QuickCheck
-import Data.Word (Word8)
-import Codec.Picture ( PixelRGBA8(..)
-                     , Image(..)
-                     , pixelAt)
-import qualified Pixs.Transformation as T
-import qualified Data.Vector.Storable as VS
-import qualified Pixs.Arithmetic as A
-import Control.Monad (replicateM)
+import           Test.Hspec
+import           Test.QuickCheck
+import           Data.Word               (Word8)
+import           Codec.Picture           ( PixelRGBA8(..)
+                                         , Image(..)
+                                         , pixelAt)
+import qualified Pixs.Transformation     as T
+import qualified Data.Vector.Storable    as VS
+import qualified Pixs.Operations.Image   as A
+import           Control.Monad           (replicateM)
 
 instance Arbitrary (Image PixelRGBA8) where
   arbitrary = do

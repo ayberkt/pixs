@@ -1,6 +1,6 @@
 {-# LANGUAGE UnicodeSyntax #-}
 
-module Pixs.PointOperations where
+module Pixs.Operations.PointOperations where
 
 import Pixs.Information.Histogram            (colorCount)
 import            Codec.Picture              (Image, PixelRGBA8(..),

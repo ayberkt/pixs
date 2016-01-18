@@ -19,11 +19,11 @@ library
   hs-source-dirs:      src
   exposed-modules:     Pixs
                      , Pixs.Types
-                     , Pixs.Arithmetic
                      , Pixs.Transformation
                      , Pixs.Filter
                      , Pixs.Information.Histogram
-                     , Pixs.PointOperations
+                     , Pixs.Operations.Image
+                     , Pixs.Operations.PointOperations
   build-depends:       base <= 4.9
                      , JuicyPixels >= 3.2
                      , containers >= 0.5.6

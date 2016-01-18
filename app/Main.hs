@@ -1,16 +1,17 @@
-{-# LANGUAGE UnicodeSyntax, GADTs, ExistentialQuantification #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE GADTs                     #-}
+{-# LANGUAGE UnicodeSyntax             #-}
 
-import           Data.Either                (partitionEithers)
-import           Codec.Picture              (DynamicImage (..), Image,
-                                             PixelRGBA8, readImage, writePng)
--- import qualified Pixs.Filter                as F
--- import qualified Pixs.Information.Histogram as H
-import qualified Pixs.Transformation        as T
-import qualified Pixs.Arithmetic            as Arith
-import qualified Pixs.PointOperations       as PO
-import           Prelude                    hiding (error, and, or)
-import qualified Options.Applicative        as A
-import           Options.Applicative        (Parser, (<>))
+import           Codec.Picture                   (DynamicImage (..), Image,
+                                                  PixelRGBA8, readImage,
+                                                  writePng)
+import           Data.Either                     (partitionEithers)
+import           Options.Applicative             (Parser, (<>))
+import qualified Options.Applicative             as A
+import qualified Pixs.Operations.Image           as Arith
+import qualified Pixs.Operations.PointOperations as PO
+import qualified Pixs.Transformation             as T
+import           Prelude                         hiding (and, error, or)
 
 data CommandType where
   SingleT ∷ FilePath
