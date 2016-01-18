@@ -1,4 +1,4 @@
-{-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE UnicodeSyntax, GADTs, ExistentialQuantification #-}
 
 import           Data.Either                (partitionEithers)
 import           Codec.Picture              (DynamicImage (..), Image,
@@ -12,10 +12,20 @@ import           Prelude                    hiding (error, and, or)
 import qualified Options.Applicative        as A
 import           Options.Applicative        (Parser, (<>))
 
-data CommandType =
-    SingleT FilePath   FilePath          (Image PixelRGBA8 → Image PixelRGBA8)
-  | MultiT  [FilePath] FilePath          ([Image PixelRGBA8] → Image PixelRGBA8)
-  | ArgT    FilePath   Int      FilePath (Int → Image PixelRGBA8 → Image PixelRGBA8)
+data CommandType where
+  SingleT ∷ FilePath → FilePath → (Image PixelRGBA8 → Image PixelRGBA8) → CommandType
+  MultiT ∷ [FilePath] → FilePath → ([Image PixelRGBA8] → Image PixelRGBA8) → CommandType
+  ArgT ∷ forall a. Read a ⇒ FilePath → a → FilePath → (a → Image PixelRGBA8 → Image PixelRGBA8) → CommandType
+
+data ReflectDirection = Origin | Horizontal | Vertical
+  deriving (Show, Eq)
+
+-- | Aliases for ReflectDirection.
+instance Read ReflectDirection where
+  readsPrec _ s | s `elem` ["h", "horizontal"] = [(Horizontal, [])]
+                | s `elem` ["v", "vertical"]   = [(Vertical, [])]
+                | s `elem` ["o", "origin"]     = [(Origin, [])]
+                | otherwise                    = []
 
 inputOption ∷ Parser FilePath
 inputOption = A.strOption (   A.long "in"
@@ -81,19 +91,19 @@ blue =  ArgT
     <*> pure T.changeBlue
 
 reflect ∷ Parser CommandType
-reflect = SingleT <$> inputOption <*> outputOption <*> pure T.reflect
-
-reflectVertical ∷ Parser CommandType
-reflectVertical = SingleT
-               <$> inputOption
-               <*> outputOption
-               <*> pure T.reflectVertical
-
-reflectHorizontal ∷ Parser CommandType
-reflectHorizontal = SingleT
-              <$> inputOption
-              <*> outputOption
-              <*> pure T.reflectHorizontal
+reflect = ArgT
+    <$> inputOption
+    <*> (A.option A.auto
+           (   A.long "direction"
+            <> A.short 'd'
+            <> A.metavar "DIRECTION"
+            <> A.help "Direction of reflect"))
+    <*> outputOption
+    <*> pure reflectDir
+  where
+    reflectDir Horizontal = T.reflectHorizontal
+    reflectDir Vertical   = T.reflectVertical
+    reflectDir Origin     = T.reflect
 
 add ∷ Parser CommandType
 add = MultiT
@@ -136,13 +146,7 @@ menu = A.subparser
                (A.progDesc "Change contrast of given image."))
          <> A.command "reflect"
              (A.info reflect
-               (A.progDesc "Reflect a given image about the origin."))
-         <> A.command "reflectVertical"
-             (A.info reflectVertical
-               (A.progDesc "Reflect a given image vertically i.e. by y = 0."))
-         <> A.command "reflectHorizontal"
-              (A.info reflectHorizontal
-                (A.progDesc "Reflect a given image horizontally i.e. by x = 0."))
+                      (A.progDesc "Reflect a given image."))
          <> A.command "add"
              (A.info add
                (A.progDesc "Add one or more images together."))
