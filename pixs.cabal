@@ -24,6 +24,7 @@ library
                      , Pixs.Information.Histogram
                      , Pixs.Operations.Image
                      , Pixs.Operations.PointOperations
+                     , Pixs.Operations.Geometric
   build-depends:       base <= 4.9
                      , JuicyPixels >= 3.2
                      , containers >= 0.5.6
