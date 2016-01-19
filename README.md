@@ -13,7 +13,7 @@ command-line interface to `Pixs`.
   - [x] Blending
   - [x] Logical AND/NAND
   - [x] Logical OR/NOR
-  - [ ] Logical XOR/XNOR
+  - [x] Logical XOR/XNOR
   - [ ] Invert/Logical NOT
   - [ ] Bitshift operators
 - Point operations

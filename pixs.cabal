@@ -22,6 +22,7 @@ library
                      , Pixs.Transformation
                      , Pixs.Filter
                      , Pixs.Information.Histogram
+                     , Pixs.Operations.Pixel
                      , Pixs.Operations.Image
                      , Pixs.Operations.PointOperations
                      , Pixs.Operations.Geometric

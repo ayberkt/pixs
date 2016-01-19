@@ -10,6 +10,7 @@ import           Options.Applicative             (Parser, (<>))
 import qualified Options.Applicative             as A
 import qualified Pixs.Operations.Image           as Arith
 import qualified Pixs.Operations.PointOperations as PO
+import           Pixs.Operations.Pixel           ()
 import qualified Pixs.Transformation             as T
 import           Prelude                         hiding (and, error, or,
                                                          subtract)

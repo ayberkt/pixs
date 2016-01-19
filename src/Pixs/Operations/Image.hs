@@ -11,8 +11,8 @@ import           Codec.Picture          ( PixelRGBA8(..)
                                         , pixelAt
                                         , generateImage)
 
-import           Pixs.Transformation    ()
-import           Pixs.Transformation    (pixelDiv, scale)
+import           Pixs.Operations.Pixel  (pixelDiv, scale)
+import           Pixs.Operations.Pixel  ()
 import           Data.Bits              ((.&.), (.|.))
 import qualified Data.Bits              as Bits
 import           Prelude   hiding       (sum)

@@ -11,6 +11,7 @@ import           Data.Word               (Word8)
 import           Codec.Picture           ( PixelRGBA8(..)
                                          , Image(..)
                                          , pixelAt)
+import           Pixs.Operations.Pixel   ((⊕))
 import qualified Pixs.Transformation     as T
 import qualified Data.Vector.Storable    as VS
 import qualified Pixs.Operations.Image   as A
@@ -99,7 +100,7 @@ prop_red_correct a (Positive x) (Positive y) img
     then let (PixelRGBA8 r _ _ _)  = pixelAt img x y
              newImg                = T.changeRed a img
              (PixelRGBA8 r' _ _ _) = pixelAt newImg x y
-         in r' == (r T.⊕ x)
+         in r' == (r ⊕ x)
     else True
 
 sides ∷ [Image a] → [Int]
