@@ -11,7 +11,8 @@ import qualified Options.Applicative             as A
 import qualified Pixs.Operations.Image           as Arith
 import qualified Pixs.Operations.PointOperations as PO
 import qualified Pixs.Transformation             as T
-import           Prelude                         hiding (and, error, or)
+import           Prelude                         hiding (and, error, or,
+                                                         subtract)
 
 data CommandType where
   SingleT ∷ FilePath
@@ -144,6 +145,16 @@ or = MultiT
     <*> outputOption
     <*> pure (foldl1 Arith.or)
 
+subtract ∷ Parser CommandType
+subtract = MultiT
+        <$> (A.many $ A.strOption
+          (   A.long "img"
+           <> A.metavar "IMAGE"
+           <> A.help "Image to be or'ed"))
+        <*> outputOption
+        <*> pure (foldl1 Arith.or)
+
+
 -- TODO: IMPLEMENT!
 histogram ∷ Parser CommandType
 histogram = undefined
@@ -159,9 +170,6 @@ menu = A.subparser
          <> A.command "reflect"
              (A.info reflect
                       (A.progDesc "Reflect a given image."))
-         <> A.command "add"
-             (A.info add
-               (A.progDesc "Add one or more images together."))
          <> A.command "red"
              (A.info red
                (A.progDesc "Change the red component of a given image."))
@@ -171,6 +179,12 @@ menu = A.subparser
          <> A.command "green"
               (A.info green
                 (A.progDesc "Change the green component of a given image."))
+         <> A.command "add"
+             (A.info add
+               (A.progDesc "Add one or more images together."))
+         <> A.command "subtract"
+             (A.info subtract
+               (A.progDesc "Subtract one image from another image."))
          <> A.command "and"
               (A.info and
                 (A.progDesc "Bitwise-and multiple images together."))

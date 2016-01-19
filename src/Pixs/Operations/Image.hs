@@ -29,6 +29,8 @@ add img₁ img₂ = let sum x y = (pixelAt img₁ x y) + (pixelAt img₂ x y)
 -- | Takes as input two identically sized images @img₁@ and @img₂@, and
 -- produces a new image by subtracting the pixel at @img₂@ from the
 -- corresponding one at @img₂@.
+--
+-- <<docs/example.png>> <<docs/dog.png>> <<docs/butterfly-dog-subtract.png>>
 subtract ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
 subtract img₁ img₂ = let sub x y = (pixelAt img₁ x y) - (pixelAt img₂ x y)
                      in generateImage sub (imageWidth img₁) (imageHeight img₂)
