@@ -1,5 +1,5 @@
-{-# LANGUAGE FlexibleInstances  #-}
-{-# LANGUAGE UnicodeSyntax      #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 module Pixs.Transformation ( blur
                            , reflectVertical
@@ -18,19 +18,14 @@ module Pixs.Transformation ( blur
                            , (⊕)
                            , (⊗)) where
 
-import           Data.Word
+import           Codec.Picture         (Image (..), Pixel, PixelRGB8 (..),
+                                        PixelRGBA8 (..), generateImage,
+                                        imageHeight, imageWidth, pixelAt,
+                                        pixelMap)
 import           Data.Maybe            (catMaybes)
-import           Codec.Picture         ( PixelRGBA8(..)
-                                       , PixelRGB8(..)
-                                       , Image(..)
-                                       , Pixel
-                                       , imageHeight
-                                       , imageWidth
-                                       , pixelMap
-                                       , pixelAt
-                                       , generateImage)
-import           Pixs.Types            (Color(..))
-import           Pixs.Operations.Pixel ((⊗), (⊕), limit)
+import           Data.Word
+import           Pixs.Operations.Pixel (limit, (⊕), (⊗))
+import           Pixs.Types            (Color (..))
 
 addAlphaChannel ∷ Image PixelRGB8 → Image PixelRGBA8
 addAlphaChannel = pixelMap addAlphaChannel'
