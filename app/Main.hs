@@ -155,6 +155,15 @@ subtract = MultiT
         <*> outputOption
         <*> pure (foldl1 Arith.or)
 
+multiply ∷ Parser CommandType
+multiply = MultiT
+        <$> (A.many $ A.strOption
+          (   A.long "img"
+           <> A.metavar "IMAGE"
+           <> A.help "Image to be or'ed"))
+        <*> outputOption
+        <*> pure (foldl1 Arith.multiply)
+
 
 -- TODO: IMPLEMENT!
 histogram ∷ Parser CommandType
@@ -186,6 +195,9 @@ menu = A.subparser
          <> A.command "subtract"
              (A.info subtract
                (A.progDesc "Subtract one image from another image."))
+         <> A.command "multiply"
+             (A.info multiply
+               (A.progDesc "Multiply two images together."))
          <> A.command "and"
               (A.info and
                 (A.progDesc "Bitwise-and multiple images together."))

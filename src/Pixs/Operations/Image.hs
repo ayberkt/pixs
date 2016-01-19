@@ -38,7 +38,7 @@ subtract img₁ img₂ = let sub x y = (pixelAt img₁ x y) - (pixelAt img₂ x 
 -- | Takes as input two identically sized images, @img₁@ and @img₂@. Creates
 -- a new image by multiplying the corresponding two pixels from the two.
 multiply ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
-multiply img₁ img₂ = let mul x y = (pixelAt img₁ x y) - (pixelAt img₂ x y)
+multiply img₁ img₂ = let mul x y = (pixelAt img₁ x y) * (pixelAt img₂ x y)
                      in generateImage mul (imageWidth img₁) (imageHeight img₂)
 
 divide ∷ Image PixelRGBA8 → Image PixelRGBA8 → Image PixelRGBA8
