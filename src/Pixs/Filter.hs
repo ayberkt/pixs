@@ -5,7 +5,7 @@ module Pixs.Filter where
 import           Codec.Picture       (Image (..), PixelRGBA8 (..),
                                       generateImage, pixelAt, pixelMap)
 import           Data.Word           (Word8)
-import           Pixs.Transformation (average)
+import           Pixs.Operations.Pixel (average)
 
 blackAndWhite ∷ Image PixelRGBA8 → Image PixelRGBA8
 blackAndWhite = let decolor (PixelRGBA8 r g b a)

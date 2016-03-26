@@ -1,134 +1,74 @@
-{-# LANGUAGE FlexibleInstances  #-}
-{-# LANGUAGE UnicodeSyntax      #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE UnicodeSyntax     #-}
 
 module Pixs.Transformation ( blur
-                           , flipVertical
-                           , flipHorizontal
-                           , flip
+                           , reflectVertical
+                           , reflectHorizontal
+                           , reflect
                            , changeRed
                            , changeGreen
                            , changeBlue
+                           , addAlphaChannel
                            , changeBrightness
+                           , changeContrast
                            , negateImage
                            , saturation
                            , getPixel
                            , average
                            , (⊕)
-                           , safeAdd
-                           , (⊗)
-                           , safeMultiply) where
+                           , (⊗)) where
 
+import           Codec.Picture         (Image (..), Pixel, PixelRGB8 (..),
+                                        PixelRGBA8 (..), generateImage,
+                                        imageHeight, imageWidth, pixelAt,
+                                        pixelMap)
+import           Data.Maybe            (catMaybes)
+import           Data.Word
+import           Pixs.Operations.Pixel (limit, (⊕), (⊗))
+import           Pixs.Types            (Color (..))
 
-import Prelude hiding (flip)
-import Data.Word
-import Data.Maybe (catMaybes)
-import Codec.Picture( PixelRGBA8(..)
-                    , Image(..)
-                    , Pixel
-                    , pixelMap
-                    , imageHeight
-                    , imageWidth
-                    , pixelAt
-                    , generateImage)
-
--- | Used for reducing repetition when declaring Num instance.
---   Our strategy for overflow/underflow checking is the same for all of the
---   operations so we define this function that takes in an operation and two
---   pixels and applies the operation to the components. Pixel addition for
---   example is implemented by simply passing (+) to `applyOp`.
-applyOp ∷ (Int → Int → Int) → PixelRGBA8 → PixelRGBA8 → PixelRGBA8
-applyOp op (PixelRGBA8 r₁ g₁ b₁ a₁) (PixelRGBA8 r₂ g₂ b₂ a₂)
-  = PixelRGBA8 r g b (max a₁ a₂)
-  where r' = (fromIntegral r₁ `op` fromIntegral r₂)
-        g' = (fromIntegral g₁ `op` fromIntegral g₂)
-        b' = (fromIntegral b₁ `op` fromIntegral b₂)
-        r  = fromIntegral . max 0 . min 255 $ r'   ∷ Word8
-        g  = fromIntegral . max 0 . min 255 $ g'   ∷ Word8
-        b  = fromIntegral . max 0 . min 255 $ b'   ∷ Word8
-
---   TODO: PixelRGBA8 should not really have an instance of
---   Num since it doesn't behave like a number. For
---   now we declare a num instance for the convenience of
---   being able to use (+), (-) etc... It would be the best
---   it were a VectorSpace if a VectorSpace typeclass exists
---   somewhere. Or maybe, that's too much; I don't know.
-instance Num PixelRGBA8 where
-
-  negate (PixelRGBA8 r g b _) = PixelRGBA8 r' g' b' 255
-    where r' = 255 - r
-          g' = 255 - g
-          b' = 255 - b
-
-  (+) = applyOp (+)
-
-  (-) = applyOp (-)
-
-  (*) = applyOp (*)
-
-  abs p = p
-
-  signum p = p
-
-  fromInteger _ = undefined
-
--- | Flow-checked addition operation which we denote with ⊕.
--- Also has an ASCII alias `safeAdd`.
-(⊕) ∷ Word8 → Int → Word8
-(⊕) x y = let x' = (fromIntegral x) ∷ Int
-              y' = (fromIntegral y) ∷ Int
-          in fromIntegral . max 0 . min 255 $ x' + y'
-
-safeAdd ∷ Word8 → Int → Word8
-safeAdd = (⊕)
-
--- | Flow-checked multiplication operation.
--- Also has an ASCII alias `safeMultiply`.
-(⊗) ∷ Word8 → Int → Word8
-(⊗) x y = let x' = (fromIntegral x) ∷ Int
-              y' = (fromIntegral y) ∷ Int
-          in fromIntegral . max 0 . min 255 $ x' * y'
-
-safeMultiply ∷ Word8 → Int → Word8
-safeMultiply = (⊗)
-
--- | Scalar multiplication.
--- scale ∷ Int → PixelRGBA8 → PixelRGBA8
--- scale n (PixelRGBA8 r g b a) = PixelRGBA8 (r ⊗ n) (g ⊗ n) (b ⊗ n) a
+addAlphaChannel ∷ Image PixelRGB8 → Image PixelRGBA8
+addAlphaChannel = pixelMap addAlphaChannel'
+    where addAlphaChannel' (PixelRGB8 r g b) = PixelRGBA8 r g b 0xFF
 
 changeBrightness ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 changeBrightness amount = pixelMap changeBrightness'
   where changeBrightness' (PixelRGBA8 r g b a) = PixelRGBA8 r' g' b' a
-          where r' = r ⊕ amount
-                g' = g ⊕ amount
-                b' = b ⊕ amount
+          where f = (⊕ amount)
+                [r', g', b'] = f <$> [r, g, b]
 
 changeRed ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
-changeRed amount = pixelMap changeRed'
-  where changeRed' (PixelRGBA8 r g b a) = PixelRGBA8 (r ⊕ amount) g b a
+changeRed = changeColor Red
 
 changeGreen ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
-changeGreen amount = pixelMap changeGreen'
-  where changeGreen' (PixelRGBA8 r g b a) = PixelRGBA8 r g' b a
-                                            where g' = g ⊕ amount
+changeGreen = changeColor Green
 
 changeBlue ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
-changeBlue amount = pixelMap changeBlue'
-  where changeBlue' (PixelRGBA8 r g b a) = PixelRGBA8 r g b' a
-                                            where b' = b ⊕ amount
+changeBlue = changeColor Blue
+
+changeColor ∷ Color → Int → Image PixelRGBA8 → Image PixelRGBA8
+changeColor c amount = pixelMap changeColor'
+  where changeColor' (PixelRGBA8 r g b a) =
+          case c of
+            Red   → let r' = r ⊗ amount in PixelRGBA8 r' g  b  a
+            Green → let g' = g ⊗ amount in PixelRGBA8 r  g' b  a
+            Blue  → let b' = b ⊗ amount in PixelRGBA8 r  g  b' a
 
 saturation ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
 saturation amount = changeRed amount . changeGreen amount . changeBlue amount
 
-flipVertical ∷ Pixel a ⇒ Image a → Image a
-flipVertical img =  generateImage complement (imageWidth img) (imageHeight img)
+reflectVertical ∷ Pixel a ⇒ Image a → Image a
+reflectVertical img =  generateImage complement w h
   where complement x y = pixelAt img x (imageHeight img - y - 1)
+        [w, h]         = [imageWidth, imageHeight] <*> pure img
 
-flipHorizontal ∷ Pixel a ⇒ Image a → Image a
-flipHorizontal img = generateImage complement (imageWidth img) (imageHeight img)
+reflectHorizontal ∷ Pixel a ⇒ Image a → Image a
+reflectHorizontal img = generateImage complement w h
   where complement x y = pixelAt img (imageWidth img - x - 1) y
+        [w, h]         = [imageWidth, imageHeight] <*> pure img
 
-flip ∷ Pixel a ⇒ Image a → Image a
-flip = flipVertical . flipHorizontal
+reflect ∷ Pixel a ⇒ Image a → Image a
+reflect = reflectVertical . reflectHorizontal
 
 -- | Take a list of pixels. Return the pixel that is the average color of
 -- those pixels.
@@ -164,6 +104,17 @@ blur img n = let neighbors x y = catMaybes [getPixel img (x - i) (y - j)
                  w = imageWidth  img
                  h = imageHeight img
              in generateImage (\x y → average (neighbors x y)) w h
+
+-- | Contrast change as described in
+-- <http://goo.gl/BTI5Ka here>.
+--
+-- <<docs/example.png>> <<docs/example-contrast.png>>
+changeContrast ∷ Int → Image PixelRGBA8 → Image PixelRGBA8
+changeContrast n img = pixelMap changePixel img
+  where
+    factor = (259 * (n + 255)) `div` (255 * (259 - n))
+    f x = fromIntegral $ limit $ factor * (fromIntegral x - 128) + 128
+    changePixel (PixelRGBA8 r g b a) = PixelRGBA8 (f r) (f g) (f b) a
 
 -- | Negate the color of a given image.
 negateImage ∷ Image PixelRGBA8 → Image PixelRGBA8

@@ -1,4 +1,4 @@
-# pixs [![Build Status](https://travis-ci.com/ayberkt/pixs.svg?token=2eB5JJ87XAYaE2ZJnQaJ&branch=master)](https://travis-ci.com/ayberkt/pixs)
+# pixs [![Build Status](https://travis-ci.org/ayberkt/pixs.svg?branch=master)](https://travis-ci.org/ayberkt/pixs)
 
 `Pixs` is an image processing library written entirely in Haskell. `pixs` is a
 command-line interface to `Pixs`.
@@ -9,17 +9,26 @@ command-line interface to `Pixs`.
   - [x] Addition
   - [x] Subtraction
   - [x] Multiplication
-  - [ ] Division
-  - [ ] Blending
+  - [x] Division
+  - [x] Blending
   - [x] Logical AND/NAND
-  - [ ] Logical OR/NOR
-  - [ ] Logical XOR/XNOR
+  - [x] Logical OR/NOR
+  - [x] Logical XOR/XNOR
   - [ ] Invert/Logical NOT
   - [ ] Bitshift operators
+- Point operations
+  - [x] Thresholding
+  - [ ] Adaptive thresholding
+  - [ ] Contrast stretching
+  - [ ] Histogram equalzation
+  - [ ] Logarithm operator
+  - [ ] Exponentiation operator
 - Color adjustments
   - [x] Brightness
   - [x] Colors
-  - [ ] Contrast
+  - [x] Contrast
+  - [ ] Shadows
+  - [ ] Fade
 - Geometric Operations
   - [ ] Scale
   - [ ] Rotate
@@ -32,4 +41,6 @@ command-line interface to `Pixs`.
 - Filters
   - [x] Mean blur
   - [ ] Gaussian blur
+  - [ ] Frequency filters
+  - [ ] Laplacian/Laplacian of gaussian filter
   - [x] Pixelation
